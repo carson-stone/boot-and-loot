@@ -83,6 +83,14 @@ effect type = code change to the resolver.
 - **Retroactive modifier composition** — order of card play doesn't matter
 - **Directed edges for tunnels** — one-way drops, tool-gated passages
 - **Room monsters fought every entry** — permanent environmental hazards
+- **Cards (static + dynamic markets) are always purchasable** from any room. The
+  `is_market` room flag (and `marketAccessFromAnywhere` modifier from Wandering
+  Merchant) gates **tools only**. This diverges from rulebook v0.2 §4.3, which
+  required market rooms for both cards and tools.
+- **Must carry an artifact to escape.** A player at the exit with zero held
+  artifacts cannot escape; the API rejects with `NO_ARTIFACT` and the UI
+  disables the button. This diverges from rulebook v0.2 §8, which allowed
+  empty-handed escape (worth 0 reputation).
 
 ## Files and Their Purpose
 

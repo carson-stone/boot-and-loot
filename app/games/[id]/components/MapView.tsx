@@ -40,6 +40,13 @@ export function MapView({ map, players, currentPlayerId, isMyTurn, onMove, onPic
     map.connections.filter((c) => c.fromRoomId === myRoomId).map((c) => c.toRoomId),
   );
 
+  // Stable per-player colors by turn order
+  const PLAYER_COLORS = ["#ef4444", "#3b82f6", "#10b981", "#f59e0b", "#a855f7"];
+  function playerColor(playerId: string): string {
+    const p = players.find((pp) => pp.id === playerId);
+    return PLAYER_COLORS[p?.turnOrder ?? 0] ?? "#64748b";
+  }
+
   return (
     <Card>
       <CardContent className="p-2">
@@ -120,12 +127,36 @@ export function MapView({ map, players, currentPlayerId, isMyTurn, onMove, onPic
                     {room.isEntrance && "🚪"}
                   </text>
                   {playersHere.length > 0 && (
-                    <text x={c.x} y={c.y + 12} textAnchor="middle" fontSize="8" fill="#0f172a">
-                      {playersHere.map((p) => p.name[0]).join("")}
-                    </text>
-                  )}
-                  {playersHere.some((p) => p.id === currentPlayerId) && (
-                    <circle cx={c.x + 38} cy={c.y - 24} r={5} fill="#0ea5e9" />
+                    <g>
+                      {playersHere.map((p, idx) => {
+                        const tokenX = c.x - (playersHere.length - 1) * 10 + idx * 20;
+                        const tokenY = c.y + 18;
+                        const isMe = p.id === currentPlayerId;
+                        return (
+                          <g key={p.id}>
+                            <circle
+                              cx={tokenX}
+                              cy={tokenY}
+                              r={9}
+                              fill={playerColor(p.id)}
+                              stroke={isMe ? "#0f172a" : "#fff"}
+                              strokeWidth={isMe ? 2.5 : 1.5}
+                            />
+                            <text
+                              x={tokenX}
+                              y={tokenY + 3}
+                              textAnchor="middle"
+                              fontSize="9"
+                              fontWeight="700"
+                              fill="#fff"
+                            >
+                              {p.name[0]?.toUpperCase()}
+                            </text>
+                            <title>{p.name}{isMe ? " (you)" : ""}</title>
+                          </g>
+                        );
+                      })}
+                    </g>
                   )}
                 </g>
               );
@@ -157,8 +188,17 @@ export function MapView({ map, players, currentPlayerId, isMyTurn, onMove, onPic
                 </Button>
               )}
               {myRoom.isExit && (
-                <Button size="sm" variant="default" disabled={!isMyTurn} onClick={onEscape}>
+                <Button
+                  size="sm"
+                  variant="default"
+                  disabled={!isMyTurn || !me || me.artifactCount === 0}
+                  onClick={onEscape}
+                  title={me && me.artifactCount === 0 ? "Need at least one artifact to escape" : undefined}
+                >
                   🚪 Escape!
+                  {me && me.artifactCount === 0 && (
+                    <span className="ml-1 text-xs opacity-75">(need an artifact)</span>
+                  )}
                 </Button>
               )}
             </div>

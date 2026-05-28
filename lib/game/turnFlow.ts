@@ -204,11 +204,18 @@ export async function escapePlayer(gameId: string, playerId: string, turnId: str
 
   const player = await prisma.player.findUniqueOrThrow({
     where: { id: playerId },
-    include: { currentRoom: true },
+    include: { currentRoom: true, gameArtifacts: true },
   });
 
   if (!player.currentRoom?.isExit) {
     throw new GameError("Not at the exit", "NOT_AT_EXIT");
+  }
+
+  if (player.gameArtifacts.length === 0) {
+    throw new GameError(
+      "Must carry at least one artifact to escape the dungeon",
+      "NO_ARTIFACT",
+    );
   }
 
   // Check remaining movement (need >=1) by looking at turn state

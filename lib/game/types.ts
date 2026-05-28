@@ -26,6 +26,7 @@ export interface GameView {
   attentionPoolSize: number;
   hordeDamageAmount: number;
   artifacts: ArtifactView[];
+  marketAccessFromAnywhere: boolean;
 }
 
 export interface MapView {

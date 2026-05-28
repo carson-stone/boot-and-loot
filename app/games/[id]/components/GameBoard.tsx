@@ -99,7 +99,7 @@ export function GameBoard({ gameId, state, playerId, onPlayerSelect, onUpdate }:
   return (
     <div className="min-h-screen bg-slate-50">
       <div className="max-w-[1400px] mx-auto p-4 space-y-4">
-        <PlayerStatusBar players={state.players} currentTurnPlayerId={state.currentTurnPlayerId} turnNumber={state.turnNumber} />
+        <PlayerStatusBar players={state.players} rooms={state.map.rooms} currentTurnPlayerId={state.currentTurnPlayerId} turnNumber={state.turnNumber} />
 
         {error && (
           <div className="bg-red-50 border border-red-200 text-red-900 rounded-md px-4 py-2 text-sm">
@@ -147,6 +147,7 @@ export function GameBoard({ gameId, state, playerId, onPlayerSelect, onUpdate }:
               isMyTurn={isMyTurn}
               myGold={me.gold}
               myRoomIsMarket={state.map.rooms.find((r) => r.id === me.currentRoomId)?.isMarket ?? false}
+              marketAccessFromAnywhere={state.marketAccessFromAnywhere}
               myTools={me.tools}
               onBuyCard={(p) => callApi("/buy-card", { playerId, ...p })}
               onBuyTool={(toolCode) => callApi("/buy-tool", { playerId, toolCode })}

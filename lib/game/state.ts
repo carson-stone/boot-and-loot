@@ -284,6 +284,13 @@ export async function loadGameState(gameId: string, requestingPlayerId?: string)
     (a) => ({ type: a.type, details: a as Record<string, unknown> }),
   );
 
+  // Compute current turn modifiers (only marketAccessFromAnywhere is exposed for now)
+  let marketAccessFromAnywhere = false;
+  if (game.currentTurn) {
+    const turnState = await loadTurnState(game.currentTurn.id);
+    marketAccessFromAnywhere = turnState.modifiers.marketAccessFromAnywhere;
+  }
+
   // Build room connections from the included data
   const allConnections = game.map.rooms.flatMap((r) =>
     r.connectionsFrom.map((c) => ({
@@ -380,5 +387,6 @@ export async function loadGameState(gameId: string, requestingPlayerId?: string)
       roomId: a.roomId,
       heldByPlayerId: a.heldByPlayerId,
     })),
+    marketAccessFromAnywhere,
   };
 }
