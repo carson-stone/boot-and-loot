@@ -1,3 +1,4 @@
+import "dotenv/config";
 import { PrismaClient } from "../lib/generated/prisma/client";
 import type { CardType, CardPool } from "../lib/generated/prisma/enums";
 import { PrismaPg } from "@prisma/adapter-pg";
