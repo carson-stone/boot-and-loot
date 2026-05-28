@@ -337,6 +337,7 @@ export async function loadGameState(gameId: string, requestingPlayerId?: string)
       handCount: p._count.gameCards,
       artifactCount: p._count.gameArtifacts,
       tools: p.tools.map((t) => t.toolDefinition.code),
+      reputationFinal: p.reputationFinal,
     })),
     currentTurnPlayerId: game.currentTurn?.playerId ?? null,
     turnNumber: game.currentTurn?.turnNumber ?? null,

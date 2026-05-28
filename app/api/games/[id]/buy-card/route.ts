@@ -11,10 +11,14 @@ export async function POST(
   try {
     const { id: gameId } = await params;
     const body = await request.json();
-    const { playerId, gameCardId } = body;
+    const { playerId, gameCardId, cardDefinitionId } = body;
 
-    if (!playerId || !gameCardId) {
-      return NextResponse.json({ error: "playerId and gameCardId are required" }, { status: 400 });
+    if (!playerId) {
+      return NextResponse.json({ error: "playerId is required" }, { status: 400 });
+    }
+
+    if (!gameCardId && !cardDefinitionId) {
+      return NextResponse.json({ error: "gameCardId or cardDefinitionId required" }, { status: 400 });
     }
 
     const game = await prisma.game.findUniqueOrThrow({
@@ -27,8 +31,24 @@ export async function POST(
       throw new GameError("Not your turn", "NOT_YOUR_TURN");
     }
 
+    // For static market purchases by card definition, find any available card
+    let resolvedGameCardId = gameCardId;
+    if (!resolvedGameCardId && cardDefinitionId) {
+      const staticCard = await prisma.gameCard.findFirst({
+        where: {
+          gameId,
+          cardDefinitionId,
+          location: "static_market",
+        },
+      });
+      if (!staticCard) {
+        throw new GameError("No cards of that type available in static market", "OUT_OF_STOCK");
+      }
+      resolvedGameCardId = staticCard.id;
+    }
+
     const turnState = await loadTurnState(game.currentTurn.id);
-    const result = await buyCard(gameId, playerId, gameCardId, turnState);
+    const result = await buyCard(gameId, playerId, resolvedGameCardId, turnState);
 
     return NextResponse.json(result);
   } catch (error) {

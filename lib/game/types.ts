@@ -71,6 +71,7 @@ export interface PlayerSummary {
   handCount: number;
   artifactCount: number;
   tools: string[];
+  reputationFinal: number | null;
 }
 
 export interface MarketCardView {
