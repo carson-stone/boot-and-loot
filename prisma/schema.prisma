@@ -1,0 +1,424 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// =====================================================================
+// ENUMS
+// =====================================================================
+
+enum CardType {
+  monster
+  device
+  companion
+}
+
+enum CardPool {
+  starter
+  static
+  dynamic
+}
+
+enum GameStatus {
+  waiting
+  active
+  finished
+}
+
+enum CardLocation {
+  static_market
+  dynamic_market
+  dynamic_deck
+  player_deck
+  player_hand
+  player_play_area
+  player_discard
+  trashed
+}
+
+// =====================================================================
+// 1. MAPS, ROOMS, AND CONNECTIONS
+// =====================================================================
+
+model Map {
+  id          String   @id @default(uuid()) @db.Uuid
+  name        String   @unique
+  description String?
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz()
+
+  rooms                 Room[]
+  games                 Game[]
+  artifactPlacements    MapArtifactPlacement[]
+
+  @@map("maps")
+}
+
+model Room {
+  id              String  @id @default(uuid()) @db.Uuid
+  mapId           String  @map("map_id") @db.Uuid
+  name            String
+  isEntrance      Boolean @default(false) @map("is_entrance")
+  isExit          Boolean @default(false) @map("is_exit")
+  isMarket        Boolean @default(false) @map("is_market")
+  hasArtifactSlot Boolean @default(false) @map("has_artifact_slot")
+  monsterCount    Int     @default(0) @map("monster_count")
+  positionX       Int?    @map("position_x")
+  positionY       Int?    @map("position_y")
+
+  map               Map                    @relation(fields: [mapId], references: [id], onDelete: Cascade)
+  connectionsFrom   RoomConnection[]       @relation("from_room")
+  connectionsTo     RoomConnection[]       @relation("to_room")
+  players           Player[]               @relation("player_current_room")
+  gameArtifacts     GameArtifact[]
+  artifactPlacements MapArtifactPlacement[]
+  turnsStartedHere  Turn[]                 @relation("turn_starting_room")
+
+  @@unique([mapId, name])
+  @@index([mapId])
+  @@map("rooms")
+}
+
+model RoomConnection {
+  id           String  @id @default(uuid()) @db.Uuid
+  fromRoomId   String  @map("from_room_id") @db.Uuid
+  toRoomId     String  @map("to_room_id") @db.Uuid
+  movementCost Int     @default(1) @map("movement_cost")
+  requiresTool String? @map("requires_tool")
+  description  String?
+
+  fromRoom Room @relation("from_room", fields: [fromRoomId], references: [id], onDelete: Cascade)
+  toRoom   Room @relation("to_room", fields: [toRoomId], references: [id], onDelete: Cascade)
+
+  @@unique([fromRoomId, toRoomId])
+  @@index([fromRoomId])
+  @@map("room_connections")
+}
+
+// =====================================================================
+// 2. TOOLS
+// =====================================================================
+
+model ToolDefinition {
+  id          String @id @default(uuid()) @db.Uuid
+  code        String @unique
+  name        String
+  description String?
+  costGold    Int    @default(0) @map("cost_gold")
+
+  playerTools PlayerTool[]
+
+  @@map("tool_definitions")
+}
+
+// =====================================================================
+// 3. ARTIFACTS
+// =====================================================================
+
+model ArtifactDefinition {
+  id               String  @id @default(uuid()) @db.Uuid
+  name             String  @unique
+  description      String?
+  reputationPoints Int     @map("reputation_points")
+  flavorText       String? @map("flavor_text")
+
+  placements    MapArtifactPlacement[]
+  gameArtifacts GameArtifact[]
+
+  @@map("artifact_definitions")
+}
+
+model MapArtifactPlacement {
+  id                   String @id @default(uuid()) @db.Uuid
+  mapId                String @map("map_id") @db.Uuid
+  roomId               String @map("room_id") @db.Uuid
+  artifactDefinitionId String @map("artifact_definition_id") @db.Uuid
+
+  map                Map                @relation(fields: [mapId], references: [id], onDelete: Cascade)
+  room               Room               @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  artifactDefinition ArtifactDefinition @relation(fields: [artifactDefinitionId], references: [id])
+
+  @@unique([mapId, roomId])
+  @@map("map_artifact_placements")
+}
+
+// =====================================================================
+// 4. CARD DEFINITIONS
+// =====================================================================
+
+model CardDefinition {
+  id              String   @id @default(uuid()) @db.Uuid
+  name            String   @unique
+  cardType        CardType @map("card_type")
+  pool            CardPool
+  costGold        Int      @default(0) @map("cost_gold")
+  isOneTimeUse    Boolean  @default(false) @map("is_one_time_use")
+  triggersHorde   Boolean  @default(false) @map("triggers_horde")
+  isKillableThreat Boolean @default(false) @map("is_killable_threat")
+  description     String?
+  flavorText      String?  @map("flavor_text")
+  totalQuantity   Int      @map("total_quantity")
+
+  effects           CardEffect[]
+  resolutionOptions CardResolutionOption[]
+  gameCards         GameCard[]
+
+  @@map("card_definitions")
+}
+
+// =====================================================================
+// 5. CARD EFFECTS (on-play primitives)
+// =====================================================================
+
+model CardEffect {
+  id               String @id @default(uuid()) @db.Uuid
+  cardDefinitionId String @map("card_definition_id") @db.Uuid
+  displayOrder     Int    @default(0) @map("display_order")
+  effectType       String @map("effect_type")
+  amount           Int    @default(0)
+  parametersJson   Json   @default("{}") @map("parameters_json")
+
+  cardDefinition CardDefinition @relation(fields: [cardDefinitionId], references: [id], onDelete: Cascade)
+
+  @@unique([cardDefinitionId, displayOrder])
+  @@index([cardDefinitionId, displayOrder])
+  @@map("card_effects")
+}
+
+// =====================================================================
+// 6. CARD RESOLUTION OPTIONS (for killable threats)
+// =====================================================================
+
+model CardResolutionOption {
+  id               String @id @default(uuid()) @db.Uuid
+  cardDefinitionId String @map("card_definition_id") @db.Uuid
+  label            String
+  displayOrder     Int    @default(0) @map("display_order")
+  costAttacks      Int    @default(0) @map("cost_attacks")
+  costGold         Int    @default(0) @map("cost_gold")
+  costAttention    Int    @default(0) @map("cost_attention")
+  costHealth       Int    @default(0) @map("cost_health")
+  specialCostJson  Json   @default("{}") @map("special_cost_json")
+  rewardGold       Int    @default(0) @map("reward_gold")
+  rewardReputation Int    @default(0) @map("reward_reputation")
+
+  cardDefinition CardDefinition @relation(fields: [cardDefinitionId], references: [id], onDelete: Cascade)
+
+  @@index([cardDefinitionId, displayOrder])
+  @@map("card_resolution_options")
+}
+
+// =====================================================================
+// 7. GAMES & PLAYERS
+// =====================================================================
+
+model Game {
+  id                  String     @id @default(uuid()) @db.Uuid
+  status              GameStatus @default(waiting)
+  mapId               String     @map("map_id") @db.Uuid
+  maxPlayers          Int        @default(5) @map("max_players")
+  attentionPoolSize   Int        @default(20) @map("attention_pool_size")
+  hordeDamageAmount   Int        @default(3) @map("horde_damage_amount")
+  currentTurnId       String?    @map("current_turn_id") @db.Uuid
+  winnerPlayerId      String?    @map("winner_player_id") @db.Uuid
+  createdAt           DateTime   @default(now()) @map("created_at") @db.Timestamptz()
+  startedAt           DateTime?  @map("started_at") @db.Timestamptz()
+  finishedAt          DateTime?  @map("finished_at") @db.Timestamptz()
+  updatedAt           DateTime   @default(now()) @updatedAt @map("updated_at") @db.Timestamptz()
+
+  map           Map            @relation(fields: [mapId], references: [id])
+  currentTurn   Turn?          @relation("game_current_turn", fields: [currentTurnId], references: [id])
+  winnerPlayer  Player?        @relation("game_winner", fields: [winnerPlayerId], references: [id])
+  players       Player[]       @relation("game_players")
+  gameCards     GameCard[]
+  gameArtifacts GameArtifact[]
+  turns         Turn[]         @relation("game_turns")
+  hordeAttacks  HordeAttack[]
+
+  @@map("games")
+}
+
+model Player {
+  id               String    @id @default(uuid()) @db.Uuid
+  gameId           String    @map("game_id") @db.Uuid
+  userId           String?   @map("user_id") @db.Uuid
+  name             String
+  turnOrder        Int       @map("turn_order")
+  currentRoomId    String?   @map("current_room_id") @db.Uuid
+  maxHealth        Int       @default(10) @map("max_health")
+  currentHealth    Int       @default(10) @map("current_health")
+  gold             Int       @default(0)
+  attentionPoints  Int       @default(0) @map("attention_points")
+  artifactCapacity Int       @default(1) @map("artifact_capacity")
+  hasExited        Boolean   @default(false) @map("has_exited")
+  isDead           Boolean   @default(false) @map("is_dead")
+  reputationFinal  Int?      @map("reputation_final")
+  exitedAt         DateTime? @map("exited_at") @db.Timestamptz()
+  diedAt           DateTime? @map("died_at") @db.Timestamptz()
+
+  game              Game               @relation("game_players", fields: [gameId], references: [id], onDelete: Cascade)
+  currentRoom       Room?              @relation("player_current_room", fields: [currentRoomId], references: [id])
+  tools             PlayerTool[]
+  gameCards         GameCard[]
+  gameArtifacts     GameArtifact[]
+  turns             Turn[]
+  achievements      PlayerAchievement[]
+  wonGames          Game[]             @relation("game_winner")
+
+  @@unique([gameId, turnOrder])
+  @@unique([gameId, name])
+  @@index([gameId])
+  @@map("players")
+}
+
+// =====================================================================
+// 8. PLAYER TOOLS (join table)
+// =====================================================================
+
+model PlayerTool {
+  id               String   @id @default(uuid()) @db.Uuid
+  playerId         String   @map("player_id") @db.Uuid
+  toolDefinitionId String   @map("tool_definition_id") @db.Uuid
+  acquiredAt       DateTime @default(now()) @map("acquired_at") @db.Timestamptz()
+
+  player         Player         @relation(fields: [playerId], references: [id], onDelete: Cascade)
+  toolDefinition ToolDefinition @relation(fields: [toolDefinitionId], references: [id])
+
+  @@unique([playerId, toolDefinitionId])
+  @@index([playerId])
+  @@map("player_tools")
+}
+
+// =====================================================================
+// 9. GAME-INSTANCE ARTIFACTS
+// =====================================================================
+
+model GameArtifact {
+  id                   String  @id @default(uuid()) @db.Uuid
+  gameId               String  @map("game_id") @db.Uuid
+  artifactDefinitionId String  @map("artifact_definition_id") @db.Uuid
+  roomId               String? @map("room_id") @db.Uuid
+  heldByPlayerId       String? @map("held_by_player_id") @db.Uuid
+  createdAt            DateTime @default(now()) @map("created_at") @db.Timestamptz()
+
+  game               Game               @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  artifactDefinition ArtifactDefinition @relation(fields: [artifactDefinitionId], references: [id])
+  room               Room?              @relation(fields: [roomId], references: [id])
+  heldByPlayer       Player?            @relation(fields: [heldByPlayerId], references: [id])
+
+  @@index([gameId])
+  @@index([roomId])
+  @@index([heldByPlayerId])
+  @@map("game_artifacts")
+}
+
+// =====================================================================
+// 10. GAME-INSTANCE CARDS
+// =====================================================================
+
+model GameCard {
+  id               String       @id @default(uuid()) @db.Uuid
+  gameId           String       @map("game_id") @db.Uuid
+  cardDefinitionId String       @map("card_definition_id") @db.Uuid
+  location         CardLocation
+  playerId         String?      @map("player_id") @db.Uuid
+  dynamicSlotIndex Int?         @map("dynamic_slot_index")
+  deckPosition     Int?         @map("deck_position")
+  createdAt        DateTime     @default(now()) @map("created_at") @db.Timestamptz()
+
+  game           Game           @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  cardDefinition CardDefinition @relation(fields: [cardDefinitionId], references: [id])
+  player         Player?        @relation(fields: [playerId], references: [id])
+  hordeAttacks   HordeAttack[]
+
+  @@index([gameId, location, playerId])
+  @@index([gameId, dynamicSlotIndex])
+  @@map("game_cards")
+}
+
+// =====================================================================
+// 11. TURNS & ACTION LOG
+// =====================================================================
+
+model Turn {
+  id               String    @id @default(uuid()) @db.Uuid
+  gameId           String    @map("game_id") @db.Uuid
+  playerId         String    @map("player_id") @db.Uuid
+  turnNumber       Int       @map("turn_number")
+  startingRoomId   String?   @map("starting_room_id") @db.Uuid
+  startingHealth   Int?      @map("starting_health")
+  startingAttention Int?     @map("starting_attention")
+  goldEarned       Int       @default(0) @map("gold_earned")
+  goldSpent        Int       @default(0) @map("gold_spent")
+  movementUsed     Int       @default(0) @map("movement_used")
+  attacksUsed      Int       @default(0) @map("attacks_used")
+  actions          Json      @default("[]")
+  startedAt        DateTime  @default(now()) @map("started_at") @db.Timestamptz()
+  completedAt      DateTime? @map("completed_at") @db.Timestamptz()
+
+  game              Game          @relation("game_turns", fields: [gameId], references: [id], onDelete: Cascade)
+  player            Player        @relation(fields: [playerId], references: [id])
+  startingRoom      Room?         @relation("turn_starting_room", fields: [startingRoomId], references: [id])
+  currentGameOf     Game[]        @relation("game_current_turn")
+  hordeAttacks      HordeAttack[]
+  playerAchievements PlayerAchievement[]
+
+  @@unique([gameId, turnNumber])
+  @@index([gameId, turnNumber])
+  @@map("turns")
+}
+
+// =====================================================================
+// 12. ACHIEVEMENTS
+// =====================================================================
+
+model AchievementDefinition {
+  id               String @id @default(uuid()) @db.Uuid
+  code             String @unique
+  name             String
+  description      String
+  reputationPoints Int    @map("reputation_points")
+
+  playerAchievements PlayerAchievement[]
+
+  @@map("achievement_definitions")
+}
+
+model PlayerAchievement {
+  id                      String   @id @default(uuid()) @db.Uuid
+  playerId                String   @map("player_id") @db.Uuid
+  achievementDefinitionId String   @map("achievement_definition_id") @db.Uuid
+  earnedOnTurnId          String?  @map("earned_on_turn_id") @db.Uuid
+  earnedAt                DateTime @default(now()) @map("earned_at") @db.Timestamptz()
+
+  player                Player                @relation(fields: [playerId], references: [id], onDelete: Cascade)
+  achievementDefinition AchievementDefinition @relation(fields: [achievementDefinitionId], references: [id])
+  turn                  Turn?                 @relation(fields: [earnedOnTurnId], references: [id])
+
+  @@unique([playerId, achievementDefinitionId])
+  @@map("player_achievements")
+}
+
+// =====================================================================
+// 13. HORDE ATTACK LOG
+// =====================================================================
+
+model HordeAttack {
+  id                  String   @id @default(uuid()) @db.Uuid
+  gameId              String   @map("game_id") @db.Uuid
+  turnId              String   @map("turn_id") @db.Uuid
+  triggeringCardId    String?  @map("triggering_card_id") @db.Uuid
+  poolSizeBefore      Int      @map("pool_size_before")
+  pointsRemoved       Int      @map("points_removed")
+  damageDistribution  Json     @map("damage_distribution")
+  createdAt           DateTime @default(now()) @map("created_at") @db.Timestamptz()
+
+  game           Game     @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  turn           Turn     @relation(fields: [turnId], references: [id])
+  triggeringCard GameCard? @relation(fields: [triggeringCardId], references: [id])
+
+  @@map("horde_attacks")
+}
