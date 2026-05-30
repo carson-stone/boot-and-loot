@@ -358,13 +358,16 @@ export async function loadGameState(gameId: string, requestingPlayerId?: string)
         positionX: r.positionX,
         positionY: r.positionY,
         playersHere: game.players.filter((p) => p.currentRoomId === r.id && !p.isDead && !p.hasExited).map((p) => p.id),
-        artifact: game.gameArtifacts.find((a) => a.roomId === r.id)
-          ? {
-              id: game.gameArtifacts.find((a) => a.roomId === r.id)!.id,
-              name: game.gameArtifacts.find((a) => a.roomId === r.id)!.artifactDefinition.name,
-              reputationPoints: game.gameArtifacts.find((a) => a.roomId === r.id)!.artifactDefinition.reputationPoints,
-            }
-          : null,
+        artifact: (() => {
+          const a = game.gameArtifacts.find((a) => a.roomId === r.id);
+          return a ? {
+            id: a.id,
+            name: a.artifactDefinition.name,
+            description: a.artifactDefinition.description,
+            flavorText: a.artifactDefinition.flavorText,
+            reputationPoints: a.artifactDefinition.reputationPoints,
+          } : null;
+        })(),
       })),
       connections: allConnections,
     },
@@ -385,6 +388,8 @@ export async function loadGameState(gameId: string, requestingPlayerId?: string)
       artifacts: p.gameArtifacts.map((a) => ({
         id: a.id,
         name: a.artifactDefinition.name,
+        description: a.artifactDefinition.description,
+        flavorText: a.artifactDefinition.flavorText,
         reputationPoints: a.artifactDefinition.reputationPoints,
       })),
       achievements: p.achievements.map((a) => ({
@@ -431,6 +436,8 @@ export async function loadGameState(gameId: string, requestingPlayerId?: string)
     artifacts: game.gameArtifacts.map((a) => ({
       id: a.id,
       name: a.artifactDefinition.name,
+      description: a.artifactDefinition.description,
+      flavorText: a.artifactDefinition.flavorText,
       reputationPoints: a.artifactDefinition.reputationPoints,
       roomId: a.roomId,
       heldByPlayerId: a.heldByPlayerId,

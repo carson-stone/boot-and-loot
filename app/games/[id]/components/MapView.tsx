@@ -1,9 +1,11 @@
 "use client";
 
-import type { MapView as MapData, PlayerSummary } from "@/lib/game/types";
+import { useState } from "react";
+import type { MapView as MapData, PlayerSummary, RoomView } from "@/lib/game/types";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 interface Props {
   map: MapData;
@@ -18,6 +20,7 @@ interface Props {
 export function MapView({ map, players, currentPlayerId, isMyTurn, onMove, onPickupArtifact, onEscape }: Props) {
   const me = players.find((p) => p.id === currentPlayerId);
   const myRoomId = me?.currentRoomId;
+  const [inspectArtifact, setInspectArtifact] = useState<RoomView["artifact"]>(null);
 
   // Cell dimensions
   const cellSize = 150;
@@ -117,27 +120,44 @@ export function MapView({ map, players, currentPlayerId, isMyTurn, onMove, onPic
                     x={c.x - 64}
                     y={c.y - 38}
                     width={128}
-                    height={84}
+                    height={92}
                     fill={fill}
                     stroke={isReachable && isMyTurn ? "#0ea5e9" : "#cbd5e1"}
                     strokeWidth={isReachable && isMyTurn ? 2.5 : 1}
                     rx={8}
                   />
-                  <text x={c.x} y={c.y - 20} textAnchor="middle" fontSize="11" fontWeight="700" fill="#1e293b">
+                  <text x={c.x} y={c.y - 20} textAnchor="middle" fontSize="13" fontWeight="700" fill="#1e293b">
                     {room.name}
                   </text>
-                  <text x={c.x} y={c.y - 6} textAnchor="middle" fontSize="11" fill="#475569">
+                  <text x={c.x} y={c.y - 4} textAnchor="middle" fontSize="14" fill="#475569">
                     {room.isMarket && "🏪"}
-                    {room.hasArtifactSlot && room.artifact && "💎"}
+                    {room.hasArtifactSlot && room.artifact && (
+                      <>{"💎"}</>
+                    )}
                     {room.monsterCount > 0 && `👹${room.monsterCount}`}
                     {room.isEntrance && "🚪"}
                   </text>
+                  {/* Rep value beneath artifact icon — clickable */}
+                  {room.artifact && (
+                    <text
+                      x={c.x}
+                      y={c.y + 10}
+                      textAnchor="middle"
+                      fontSize="11"
+                      fontWeight="600"
+                      fill="#be185d"
+                      className="cursor-pointer"
+                      onClick={(e) => { e.stopPropagation(); setInspectArtifact(room.artifact); }}
+                    >
+                      +{room.artifact.reputationPoints} rep ›
+                    </text>
+                  )}
                   {/* Player tokens — colored circles with initial, spread horizontally */}
                   {playersHere.map((p, idx) => {
                     const total = playersHere.length;
                     const spread = (total - 1) * 26;
                     const tx = c.x - spread / 2 + idx * 26;
-                    const ty = c.y + 24;
+                    const ty = c.y + 34;
                     const isMe = p.id === currentPlayerId;
                     return (
                       <g key={p.id}>
@@ -208,6 +228,26 @@ export function MapView({ map, players, currentPlayerId, isMyTurn, onMove, onPic
           </div>
         )}
       </CardContent>
+
+      {/* Artifact inspect modal */}
+      {inspectArtifact && (
+        <Dialog open onOpenChange={(open) => !open && setInspectArtifact(null)}>
+          <DialogContent className="max-w-sm">
+            <DialogHeader>
+              <DialogTitle>💎 {inspectArtifact.name}</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-3 text-sm">
+              <div className="text-2xl font-bold text-pink-700">+{inspectArtifact.reputationPoints} reputation</div>
+              {inspectArtifact.description && (
+                <p className="text-slate-700">{inspectArtifact.description}</p>
+              )}
+              {inspectArtifact.flavorText && (
+                <p className="text-slate-500 italic border-l-2 border-slate-200 pl-3">{inspectArtifact.flavorText}</p>
+              )}
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
     </Card>
   );
 }

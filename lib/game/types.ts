@@ -54,7 +54,7 @@ export interface RoomView {
   positionX: number | null;
   positionY: number | null;
   playersHere: string[];
-  artifact: { id: string; name: string; reputationPoints: number } | null;
+  artifact: { id: string; name: string; description: string | null; flavorText: string | null; reputationPoints: number } | null;
 }
 
 export interface ConnectionView {
@@ -139,6 +139,8 @@ export interface ResolutionOptionView {
 export interface ArtifactView {
   id: string;
   name: string;
+  description: string | null;
+  flavorText: string | null;
   reputationPoints: number;
   roomId: string | null;
   heldByPlayerId: string | null;
