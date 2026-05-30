@@ -24,7 +24,7 @@ export function PlayerStatusBar({ players, currentTurnPlayerId, turnNumber, myPl
     <>
       <div className="bg-stone-900 border border-stone-700 rounded-lg p-3">
         <div className="flex items-center justify-between mb-2">
-          <h2 className="font-display text-xs text-amber-400 tracking-widest uppercase">Adventurers</h2>
+          <h2 className="font-display text-sm font-semibold tracking-wide text-amber-200">Adventurers</h2>
           {turnNumber && <span className="text-xs text-stone-300 font-display tracking-wide">Turn {turnNumber}</span>}
         </div>
 

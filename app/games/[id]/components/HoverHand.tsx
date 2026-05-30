@@ -29,7 +29,7 @@ export function HoverHand({ hand, isMyTurn, onPlay }: Props) {
       >
         <div className="w-52 min-h-[300px] max-h-[90vh] overflow-y-auto bg-stone-900 border-r border-stone-600 shadow-2xl flex flex-col gap-2 p-2">
           <div className="flex items-center justify-between mb-1 px-1">
-            <span className="font-display text-xs text-amber-300 tracking-widest uppercase">Hand</span>
+            <span className="font-display text-sm font-semibold tracking-wide text-amber-200">Hand</span>
             <button
               onClick={() => setPinned(!pinned)}
               className={`text-[10px] px-1.5 py-0.5 rounded border transition-colors ${
@@ -72,7 +72,7 @@ export function HoverHand({ hand, isMyTurn, onPlay }: Props) {
         onClick={() => setPinned(!pinned)}
       >
         <span
-          className="font-display text-amber-300 text-[10px] tracking-widest uppercase"
+          className="font-display text-amber-200 text-xs font-semibold tracking-wide"
           style={{ writingMode: "vertical-rl", transform: "rotate(180deg)" }}
         >
           Hand {hand.length > 0 ? `(${hand.length})` : ""}
