@@ -80,12 +80,17 @@ export function GameBoard({ gameId, state, playerId, onPlayerSelect, onUpdate }:
             <h3 className="font-semibold mb-2">Final Standings:</h3>
             <ul className="space-y-1">
               {state.players
-                .sort((a, b) => (b.reputationFinal ?? -1) - (a.reputationFinal ?? -1))
+                .map((p) => {
+                  const rep = p.artifacts.reduce((s, a) => s + a.reputationPoints, 0)
+                    + p.achievements.reduce((s, a) => s + a.reputationPoints, 0);
+                  return { ...p, rep };
+                })
+                .sort((a, b) => b.rep - a.rep)
                 .map((p) => (
                   <li key={p.id} className="flex justify-between border-b border-slate-100 py-1">
                     <span>{p.name}</span>
                     <span className="text-slate-600">
-                      {p.isDead ? "💀 dead (0 rep)" : `${p.reputationFinal ?? 0} reputation`}
+                      {p.isDead ? "💀 dead (0 rep)" : `${p.rep} reputation`}
                     </span>
                   </li>
                 ))}
@@ -99,7 +104,13 @@ export function GameBoard({ gameId, state, playerId, onPlayerSelect, onUpdate }:
   return (
     <div className="min-h-screen bg-slate-50">
       <div className="max-w-[1400px] mx-auto p-4 space-y-4">
-        <PlayerStatusBar players={state.players} currentTurnPlayerId={state.currentTurnPlayerId} turnNumber={state.turnNumber} />
+        <PlayerStatusBar
+          players={state.players}
+          currentTurnPlayerId={state.currentTurnPlayerId}
+          turnNumber={state.turnNumber}
+          myPlayerId={playerId}
+          myStats={isMyTurn ? state.myStats : null}
+        />
 
         {error && (
           <div className="bg-red-50 border border-red-200 text-red-900 rounded-md px-4 py-2 text-sm">

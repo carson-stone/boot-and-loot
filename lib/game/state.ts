@@ -107,7 +107,7 @@ export async function loadTurnState(turnId: string): Promise<TurnState> {
 
   // Count cards played this turn by looking at play_card actions
   const playedCardIds = actions
-    .filter((a): a is { type: "play_card"; game_card_id: string } => a.type === "play_card")
+    .filter((a): a is { type: "play_card"; game_card_id: string; card_name: string } => a.type === "play_card")
     .map((a) => a.game_card_id);
 
   for (const card of playAreaCards) {
@@ -175,6 +175,7 @@ export async function buildPlayContext(
     modifiers: { ...turnState.modifiers },
     playCounts: { ...turnState.playCounts },
     cardInstanceId,
+    cardName: gameCard.cardDefinition.name,
     cardIsOneTimeUse: gameCard.cardDefinition.isOneTimeUse,
     cardType: gameCard.cardDefinition.cardType,
   };
@@ -186,30 +187,30 @@ export async function loadGameState(gameId: string, requestingPlayerId?: string)
     include: {
       map: {
         include: {
-          rooms: {
-            include: {
-              connectionsFrom: true,
-            },
-          },
+          rooms: { include: { connectionsFrom: true } },
         },
       },
       players: {
         orderBy: { turnOrder: "asc" },
         include: {
           tools: { include: { toolDefinition: true } },
+          gameArtifacts: { include: { artifactDefinition: true } },
+          achievements: { include: { achievementDefinition: true } },
           _count: {
-            select: {
-              gameCards: { where: { location: "player_hand" } },
-              gameArtifacts: true,
-            },
+            select: { gameCards: { where: { location: "player_hand" } } },
           },
         },
       },
-      gameArtifacts: {
-        include: { artifactDefinition: true },
-      },
+      gameArtifacts: { include: { artifactDefinition: true } },
       currentTurn: true,
     },
+  });
+
+  // All turns for the full action log (newest last)
+  const allTurns = await prisma.turn.findMany({
+    where: { gameId },
+    include: { player: { select: { name: true } } },
+    orderBy: { turnNumber: "asc" },
   });
 
   // Load dynamic market
@@ -281,9 +282,52 @@ export async function loadGameState(gameId: string, requestingPlayerId?: string)
   }
 
   // Action log from current turn
-  const actionLog = ((game.currentTurn?.actions ?? []) as Array<{ type: string; [key: string]: unknown }>).map(
-    (a) => ({ type: a.type, details: a as Record<string, unknown> }),
+  // Full action log across all turns
+  const actionLog: import("./types").ActionLogView[] = allTurns.flatMap((turn) =>
+    (turn.actions as Array<{ type: string; [key: string]: unknown }>).map((a) => ({
+      type: a.type,
+      details: a as Record<string, unknown>,
+      playerName: turn.player.name,
+      turnNumber: turn.turnNumber,
+    })),
   );
+
+  // Current turn state for movement/attacks/market modifier
+  let marketAccessFromAnywhere = false;
+  let myStats: import("./types").MyTurnStats | null = null;
+  if (game.currentTurn) {
+    const turnState = await loadTurnState(game.currentTurn.id);
+    marketAccessFromAnywhere = turnState.modifiers.marketAccessFromAnywhere;
+
+    if (requestingPlayerId && game.currentTurn.playerId === requestingPlayerId) {
+      const deckCount = await prisma.gameCard.count({
+        where: { gameId, playerId: requestingPlayerId, location: "player_deck" },
+      });
+      const discardCards = await prisma.gameCard.findMany({
+        where: { gameId, playerId: requestingPlayerId, location: "player_discard" },
+        include: { cardDefinition: { include: { effects: { orderBy: { displayOrder: "asc" } } } } },
+      });
+      myStats = {
+        movementRemaining: turnState.resources.movement - turnState.movementUsedThisTurn,
+        attacksRemaining: turnState.resources.attacks - turnState.attacksUsedThisTurn,
+        deckCount,
+        discardPile: discardCards.map((c) => ({
+          gameCardId: c.id,
+          cardDefinitionId: c.cardDefinitionId,
+          name: c.cardDefinition.name,
+          cardType: c.cardDefinition.cardType,
+          costGold: c.cardDefinition.costGold,
+          isOneTimeUse: c.cardDefinition.isOneTimeUse,
+          description: c.cardDefinition.description,
+          effects: c.cardDefinition.effects.map((e) => ({
+            effectType: e.effectType,
+            amount: e.amount,
+            parametersJson: e.parametersJson as Record<string, unknown>,
+          })),
+        })),
+      };
+    }
+  }
 
   // Build room connections from the included data
   const allConnections = game.map.rooms.flatMap((r) =>
@@ -336,12 +380,22 @@ export async function loadGameState(gameId: string, requestingPlayerId?: string)
       hasExited: p.hasExited,
       isDead: p.isDead,
       handCount: p._count.gameCards,
-      artifactCount: p._count.gameArtifacts,
+      artifactCount: p.gameArtifacts.length,
       tools: p.tools.map((t) => t.toolDefinition.code),
-      reputationFinal: p.reputationFinal,
+      artifacts: p.gameArtifacts.map((a) => ({
+        id: a.id,
+        name: a.artifactDefinition.name,
+        reputationPoints: a.artifactDefinition.reputationPoints,
+      })),
+      achievements: p.achievements.map((a) => ({
+        code: a.achievementDefinition.code,
+        name: a.achievementDefinition.name,
+        reputationPoints: a.achievementDefinition.reputationPoints,
+      })),
     })),
     currentTurnPlayerId: game.currentTurn?.playerId ?? null,
     turnNumber: game.currentTurn?.turnNumber ?? null,
+    myStats,
     dynamicMarket: dynamicMarketCards.map((c) => ({
       gameCardId: c.id,
       cardDefinitionId: c.cardDefinitionId,

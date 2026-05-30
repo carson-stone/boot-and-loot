@@ -61,6 +61,7 @@ function makeCtx(overrides: Partial<PlayContext> = {}): PlayContext {
     modifiers: { ...DEFAULT_TURN_MODIFIERS },
     playCounts: { monsters: 0, devices: 0, companions: 0 },
     cardInstanceId: "card-instance-1",
+    cardName: "Test Card",
     cardIsOneTimeUse: false,
     cardType: "device",
     ...overrides,

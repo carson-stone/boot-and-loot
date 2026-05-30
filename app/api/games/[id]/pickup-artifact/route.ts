@@ -55,6 +55,7 @@ export async function POST(
       const actionLog: ActionLogEntry = {
         type: "pickup_artifact",
         game_artifact_id: gameArtifactId,
+        artifact_name: artifact.artifactDefinition.name,
       };
 
       const turn = await tx.turn.findUniqueOrThrow({ where: { id: game.currentTurn!.id } });

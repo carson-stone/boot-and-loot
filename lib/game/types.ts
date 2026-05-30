@@ -22,10 +22,18 @@ export interface GameView {
   dynamicMarket: MarketCardView[];
   staticMarket: StaticMarketView[];
   myHand: HandCardView[] | null;
+  myStats: MyTurnStats | null;
   actionLog: ActionLogView[];
   attentionPoolSize: number;
   hordeDamageAmount: number;
   artifacts: ArtifactView[];
+}
+
+export interface MyTurnStats {
+  movementRemaining: number;
+  attacksRemaining: number;
+  deckCount: number;
+  discardPile: HandCardView[];
 }
 
 export interface MapView {
@@ -71,7 +79,8 @@ export interface PlayerSummary {
   handCount: number;
   artifactCount: number;
   tools: string[];
-  reputationFinal: number | null;
+  artifacts: { id: string; name: string; reputationPoints: number }[];
+  achievements: { code: string; name: string; reputationPoints: number }[];
 }
 
 export interface MarketCardView {
@@ -138,6 +147,8 @@ export interface ArtifactView {
 export interface ActionLogView {
   type: string;
   details: Record<string, unknown>;
+  playerName: string;
+  turnNumber: number;
 }
 
 export class GameError extends Error {

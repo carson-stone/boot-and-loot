@@ -109,6 +109,7 @@ export interface PlayContext {
   modifiers: TurnModifiers;
   playCounts: PlayCounts;
   cardInstanceId: string;            // the game_cards.id being played
+  cardName: string;                  // human-readable name for action log
   cardIsOneTimeUse: boolean;         // from card_definitions.is_one_time_use
   cardType: "monster" | "device" | "companion";
 }
@@ -166,12 +167,12 @@ export class StateDelta {
 /** An entry destined for turns.actions JSONB. */
 export type ActionLogEntry =
   | { type: "effect_resolved"; effect_type: string; details: Record<string, unknown> }
-  | { type: "play_card"; game_card_id: string }
-  | { type: "move"; from_room_id: string; to_room_id: string; movement_cost: number }
-  | { type: "buy_card"; game_card_id: string; from: "static" | "dynamic"; gold_paid: number }
-  | { type: "buy_tool"; tool_code: string; gold_paid: number }
-  | { type: "pickup_artifact"; game_artifact_id: string }
-  | { type: "defeat_threat"; game_card_id: string; resolution_option_id: string; label: string }
+  | { type: "play_card"; game_card_id: string; card_name: string }
+  | { type: "move"; from_room_id: string; to_room_id: string; from_room_name: string; to_room_name: string; movement_cost: number; damage_taken?: number }
+  | { type: "buy_card"; game_card_id: string; card_name: string; from: "static" | "dynamic"; gold_paid: number }
+  | { type: "buy_tool"; tool_code: string; tool_name: string; gold_paid: number }
+  | { type: "pickup_artifact"; game_artifact_id: string; artifact_name: string }
+  | { type: "defeat_threat"; game_card_id: string; threat_name: string; resolution_option_id: string; label: string }
   | { type: "horde_attack"; horde_attack_id: string }
   | { type: "escape"; player_id: string };
 
@@ -373,6 +374,7 @@ export function resolveCardPlay(
   delta.actionLogEntries.push({
     type: "play_card",
     game_card_id: ctx.cardInstanceId,
+    card_name: ctx.cardName,
   });
 
   for (const effect of effects) {

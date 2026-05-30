@@ -47,6 +47,7 @@ export async function buyCard(
     const actionLog: ActionLogEntry = {
       type: "buy_card",
       game_card_id: gameCardId,
+      card_name: gameCard.cardDefinition.name,
       from: gameCard.location === "static_market" ? "static" : "dynamic",
       gold_paid: gameCard.cardDefinition.costGold,
     };
@@ -121,7 +122,7 @@ export async function buyTool(
         goldSpent: { increment: tool.costGold },
         actions: [
           ...existingActions,
-          { type: "buy_tool", tool_code: toolCode, gold_paid: tool.costGold },
+          { type: "buy_tool", tool_code: toolCode, tool_name: tool.name, gold_paid: tool.costGold },
         ] as never,
       },
     });

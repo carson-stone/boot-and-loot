@@ -110,6 +110,7 @@ export async function resolveThreat(
     const actionLog: ActionLogEntry = {
       type: "defeat_threat",
       game_card_id: gameCardId,
+      threat_name: gameCard.cardDefinition.name,
       resolution_option_id: resolutionOptionId,
       label: option.label,
     };
