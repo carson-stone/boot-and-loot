@@ -207,17 +207,33 @@ export function MapView({ map, players, currentPlayerId, isMyTurn, movementRemai
 
         {/* Legend */}
         <div className="border-t border-slate-200 pt-2 mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-700">
-          <span className="font-semibold text-slate-900">Legend:</span>
+          <span className="font-semibold text-slate-900">Rooms:</span>
           <span><span className="inline-block w-3 h-3 rounded-sm bg-amber-100 border border-amber-300 mr-1 align-middle" />Your room</span>
           <span><span className="inline-block w-3 h-3 rounded-sm bg-emerald-100 border border-emerald-300 mr-1 align-middle" />Entrance / Exit</span>
-          <span><span className="inline-block w-3 h-3 rounded-sm bg-blue-100 border border-blue-300 mr-1 align-middle" />Market room</span>
-          <span><span className="inline-block w-3 h-3 rounded-sm bg-pink-100 border border-pink-300 mr-1 align-middle" />Has artifact</span>
+          <span><span className="inline-block w-3 h-3 rounded-sm bg-blue-100 border border-blue-300 mr-1 align-middle" />Market</span>
+          <span><span className="inline-block w-3 h-3 rounded-sm bg-pink-100 border border-pink-300 mr-1 align-middle" />Artifact</span>
           <span><span className="inline-block w-3 h-3 rounded-sm border-2 border-sky-400 mr-1 align-middle" />Reachable</span>
-          <span>💎 Artifact present</span>
-          <span>👹 Monsters</span>
-          <span>🔑 Requires key</span>
-          <span>▶ One-way passage</span>
-          <span><span className="inline-flex items-center justify-center w-4 h-4 rounded-full bg-slate-900 text-white text-[9px] font-bold mr-1 align-middle">2</span>Movement cost</span>
+          <span>💎 Artifact present &nbsp; 👹 Monsters</span>
+          <span className="font-semibold text-slate-900">Tunnels:</span>
+          <span className="flex items-center gap-1">
+            <svg width="28" height="8"><line x1="0" y1="4" x2="28" y2="4" stroke="#94a3b8" strokeWidth="1.5" /></svg>
+            Normal
+          </span>
+          <span className="flex items-center gap-1">
+            <svg width="28" height="8"><line x1="0" y1="4" x2="28" y2="4" stroke="#dc2626" strokeWidth="2" strokeDasharray="6,3" /></svg>
+            Requires 🔑
+          </span>
+          <span className="flex items-center gap-1">
+            <svg width="28" height="8">
+              <line x1="0" y1="4" x2="22" y2="4" stroke="#94a3b8" strokeWidth="1.5" />
+              <polygon points="16,1 22,4 16,7" fill="#94a3b8" />
+            </svg>
+            One-way
+          </span>
+          <span className="flex items-center gap-1">
+            <span className="inline-flex items-center justify-center w-4 h-4 rounded-full bg-slate-900 text-white text-[9px] font-bold">2</span>
+            Costs 2 movement
+          </span>
         </div>
 
         {/* Current room actions */}

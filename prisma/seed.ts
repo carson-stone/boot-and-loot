@@ -316,7 +316,7 @@ async function main() {
     { from: "Deep Well", to: "Ossuary", bidirectional: true, cost: 1, requiresTool: null, description: null },
     { from: "Trapped Vault", to: "Forgotten Library", bidirectional: true, cost: 1, requiresTool: null, description: null },
     { from: "Trapped Vault", to: "Ossuary", bidirectional: true, cost: 1, requiresTool: null, description: null },
-    { from: "Burial Chamber", to: "Echoing Cavern", bidirectional: true, cost: 1, requiresTool: "skeleton_key", description: "Hidden door back up" },
+    { from: "Burial Chamber", to: "Echoing Cavern", bidirectional: false, cost: 1, requiresTool: "skeleton_key", description: "Hidden door back up" },
     { from: "Burial Chamber", to: "Sunken Reliquary", bidirectional: true, cost: 1, requiresTool: null, description: null },
     { from: "Burial Chamber", to: "Ossuary", bidirectional: true, cost: 1, requiresTool: "skeleton_key", description: "Sealed crypt door" },
     { from: "Whispering Tunnel", to: "Sunken Reliquary", bidirectional: true, cost: 1, requiresTool: null, description: null },
