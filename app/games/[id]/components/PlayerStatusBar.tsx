@@ -4,6 +4,7 @@ import { useState } from "react";
 import type { PlayerSummary, MyTurnStats, HandCardView } from "@/lib/game/types";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { GameCardTile } from "./GameCardTile";
 
 interface Props {
@@ -12,11 +13,14 @@ interface Props {
   turnNumber: number | null;
   myPlayerId: string | null;
   myStats: MyTurnStats | null;
+  isMyTurn: boolean;
+  onEndTurn: () => void;
 }
 
 const PLAYER_COLORS = ["#ef4444", "#3b82f6", "#10b981", "#f59e0b", "#a855f7"];
 
-export function PlayerStatusBar({ players, currentTurnPlayerId, turnNumber, myPlayerId, myStats }: Props) {
+export function PlayerStatusBar({ players, currentTurnPlayerId, turnNumber, myPlayerId, myStats, isMyTurn, onEndTurn }: Props) {
+  const currentTurnPlayer = players.find((p) => p.id === currentTurnPlayerId);
   const [inspecting, setInspecting] = useState<PlayerSummary | null>(null);
   const [discardOpen, setDiscardOpen] = useState(false);
 
@@ -27,6 +31,20 @@ export function PlayerStatusBar({ players, currentTurnPlayerId, turnNumber, myPl
           <h2 className="font-display text-sm font-semibold tracking-wide text-amber-200">Adventurers</h2>
           {turnNumber && <span className="text-xs text-stone-300 font-display tracking-wide">Turn {turnNumber}</span>}
         </div>
+
+        {/* Turn callout */}
+        {isMyTurn ? (
+          <div className="flex items-center justify-between bg-amber-950/60 border border-amber-800 rounded px-3 py-1.5 mb-2">
+            <span className="text-xs font-semibold text-amber-300">⚡ Your turn</span>
+            <Button size="sm" variant="outline" className="h-6 text-xs border-amber-700 text-amber-300 hover:bg-amber-900 py-0 px-2" onClick={onEndTurn}>
+              End Turn →
+            </Button>
+          </div>
+        ) : currentTurnPlayer && (
+          <div className="flex items-center bg-stone-800 border border-stone-700 rounded px-3 py-1.5 mb-2">
+            <span className="text-xs text-stone-400">Waiting for <span className="text-amber-400 font-semibold">{currentTurnPlayer.name}</span>…</span>
+          </div>
+        )}
 
         <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
           {players.map((p) => {

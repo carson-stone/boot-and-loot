@@ -97,7 +97,7 @@ export function GameBoard({ gameId, state, playerId, onPlayerSelect, onUpdate }:
   };
 
   return (
-    <div className="min-h-screen bg-stone-950 flex flex-col">
+    <div className="h-screen bg-stone-950 flex flex-col overflow-hidden">
       {/* Full-width top bar */}
       <div className="px-4 pt-3 space-y-3">
         <PlayerStatusBar
@@ -106,20 +106,9 @@ export function GameBoard({ gameId, state, playerId, onPlayerSelect, onUpdate }:
           turnNumber={state.turnNumber}
           myPlayerId={playerId}
           myStats={isMyTurn ? state.myStats : null}
+          isMyTurn={isMyTurn}
+          onEndTurn={() => callApi("/end-turn", { playerId })}
         />
-
-        {isMyTurn ? (
-          <div className="flex items-center justify-between bg-amber-900/60 border border-amber-700 rounded-lg px-5 py-3">
-            <span className="font-display text-amber-200 tracking-wide">⚡ Your Turn</span>
-            <Button onClick={() => callApi("/end-turn", { playerId })} variant="outline" className="border-amber-600 text-amber-200 hover:bg-amber-800">
-              End Turn →
-            </Button>
-          </div>
-        ) : currentTurnPlayer && (
-          <div className="bg-stone-800 border border-stone-600 rounded-lg px-5 py-3 text-center text-stone-400 text-sm">
-            Waiting for <span className="text-amber-300 font-semibold">{currentTurnPlayer.name}</span>…
-          </div>
-        )}
 
         <TurnRecap log={state.actionLog} currentTurnNumber={state.turnNumber} currentTurnPlayerId={state.currentTurnPlayerId} />
 
@@ -163,10 +152,10 @@ export function GameBoard({ gameId, state, playerId, onPlayerSelect, onUpdate }:
         <div className="w-56 shrink-0 self-stretch flex flex-col bg-stone-900 border border-stone-700 rounded-lg overflow-hidden">
           <div className="overflow-y-auto flex-1 min-h-0">
             {/* Loot */}
-            <div className="px-4 pt-3 pb-1 sticky top-0 bg-stone-900 z-10 border-b border-stone-800">
+            <div className="px-2 pt-3 pb-1 sticky top-0 bg-stone-900 z-10 border-b border-stone-800">
               <span className="font-display text-sm font-semibold tracking-wide text-amber-200">Loot</span>
             </div>
-            <div className="px-4 py-3 flex flex-col gap-2">
+            <div className="px-2 py-2 flex flex-col gap-2">
               {state.dynamicMarket.length === 0
                 ? <p className="text-xs text-stone-400 italic">Empty</p>
                 : state.dynamicMarket.map((card) =>
@@ -179,10 +168,10 @@ export function GameBoard({ gameId, state, playerId, onPlayerSelect, onUpdate }:
               }
             </div>
             {/* Essentials */}
-            <div className="px-4 pt-2 pb-1 sticky top-[37px] bg-stone-900 z-10 border-t border-b border-stone-800">
+            <div className="px-2 pt-2 pb-1 sticky top-[37px] bg-stone-900 z-10 border-t border-b border-stone-800">
               <span className="font-display text-sm font-semibold tracking-wide text-amber-200">Essentials</span>
             </div>
-            <div className="px-4 py-3 flex flex-col gap-2">
+            <div className="px-2 py-2 flex flex-col gap-2">
               {state.staticMarket.map((card) => (
                 <GameCardTile key={card.cardDefinitionId} card={{ ...card, available: card.available }} action={{ label: "Buy", variant: "outline", disabled: !isMyTurn || cardProps.myFocus < card.costFocus || cardProps.myGold < card.costGold || card.available === 0, onClick: () => cardProps.onBuyCard({ cardDefinitionId: card.cardDefinitionId }) }} />
               ))}
