@@ -27,22 +27,8 @@ export function PlayerStatusBar({ players, currentTurnPlayerId, turnNumber, myPl
   return (
     <>
       <div className="bg-stone-900 border border-stone-700 rounded-lg p-3">
-        <div className="flex items-center justify-between mb-2">
+        <div className="flex items-center mb-2">
           <h2 className="font-display text-sm font-semibold tracking-wide text-amber-200">Adventurers</h2>
-          {isMyTurn ? (
-            <div className="flex items-center gap-2 bg-amber-950/60 border border-amber-800 rounded px-2 py-1">
-              {turnNumber && <span className="text-xs text-amber-500 font-display tracking-wide">Turn {turnNumber}</span>}
-              <span className="text-xs font-semibold text-amber-300">⚡ Your turn</span>
-              <Button size="sm" variant="outline" className="h-5 text-[11px] border-amber-700 text-amber-300 hover:bg-amber-900 py-0 px-1.5" onClick={onEndTurn}>
-                End Turn →
-              </Button>
-            </div>
-          ) : currentTurnPlayer ? (
-            <div className="bg-stone-800 border border-stone-700 rounded px-2 py-1 flex items-center gap-2">
-              {turnNumber && <span className="text-xs text-stone-500 font-display tracking-wide">Turn {turnNumber}</span>}
-              <span className="text-xs text-stone-400">Waiting for <span className="text-amber-400 font-semibold">{currentTurnPlayer.name}</span>…</span>
-            </div>
-          ) : null}
         </div>
 
         <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
@@ -79,21 +65,34 @@ export function PlayerStatusBar({ players, currentTurnPlayerId, turnNumber, myPl
           })}
         </div>
 
-        {/* Current player turn resources */}
-        {myStats && (
-          <div className="mt-2 pt-2 border-t border-stone-700 flex flex-wrap gap-3 text-xs text-stone-400">
-            <span>🔵 <strong className="text-stone-200">{myStats.focusRemaining}</strong> focus</span>
-            <span>⚡ <strong className="text-stone-200">{myStats.movementRemaining}</strong> movement</span>
-            <span>⚔ <strong className="text-stone-200">{myStats.attacksRemaining}</strong> attacks</span>
-            <span>🂠 <strong className="text-stone-200">{myStats.deckCount}</strong> in deck</span>
-            <button
-              className="text-stone-300 underline hover:text-stone-300"
-              onClick={() => setDiscardOpen(true)}
-            >
-              🗂 {myStats.discardPile.length} discarded
-            </button>
-          </div>
-        )}
+        {/* Turn stats bar — always shown, collocates all turn context */}
+        <div className="mt-2 pt-2 border-t border-stone-700">
+          {isMyTurn ? (
+            <div className="flex items-center justify-between gap-2 bg-amber-950/60 border border-amber-800 rounded px-2 py-1.5">
+              <div className="flex flex-wrap gap-3 text-xs text-stone-300">
+                {turnNumber && <span className="text-amber-500 font-display">Turn {turnNumber}</span>}
+                <span className="text-amber-300 font-semibold">⚡ Your turn</span>
+                {myStats && <>
+                  <span>🔵 <strong className="text-stone-100">{myStats.focusRemaining}</strong></span>
+                  <span>👟 <strong className="text-stone-100">{myStats.movementRemaining}</strong></span>
+                  <span>⚔ <strong className="text-stone-100">{myStats.attacksRemaining}</strong></span>
+                  <span>🂠 <strong className="text-stone-100">{myStats.deckCount}</strong></span>
+                  <button className="text-stone-300 underline hover:text-stone-100" onClick={() => setDiscardOpen(true)}>
+                    🗂 {myStats.discardPile.length}
+                  </button>
+                </>}
+              </div>
+              <Button size="sm" variant="outline" className="shrink-0 h-6 text-xs border-amber-700 text-amber-300 hover:bg-amber-900 py-0 px-2" onClick={onEndTurn}>
+                End Turn →
+              </Button>
+            </div>
+          ) : currentTurnPlayer ? (
+            <div className="bg-stone-800 border border-stone-700 rounded px-2 py-1.5 flex items-center gap-2 text-xs">
+              {turnNumber && <span className="text-stone-500 font-display">Turn {turnNumber}</span>}
+              <span className="text-stone-400">Waiting for <span className="text-amber-400 font-semibold">{currentTurnPlayer.name}</span>…</span>
+            </div>
+          ) : null}
+        </div>
       </div>
 
       {/* Player inspect modal */}
