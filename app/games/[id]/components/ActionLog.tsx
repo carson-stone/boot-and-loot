@@ -131,7 +131,7 @@ function formatEffect(d: Record<string, unknown>): string {
     case "draw_cards":              return `draw ${amt} card${amt !== 1 ? "s" : ""}`;
     case "heal":                    return `healed ${amt} HP`;
     case "remove_attention":        return `-${amt} attention`;
-    case "redirect_attention_to_filler": return `moved ${amt} attention to filler pool`;
+    case "redirect_attention_to_filler": return `dissolved ${amt} attention into the Din`;
     case "all_others_gain_attention": return `all others +${amt} attention`;
     case "all_others_lose_gold_this_turn": return `all others −${amt} gold this turn`;
     case "multiply_gold_this_turn": return `gold ×${(details?.factor ?? amount) as number} this turn`;
