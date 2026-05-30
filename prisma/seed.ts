@@ -79,6 +79,7 @@ async function main() {
       costAttacks?: number; costGold?: number; costAttention?: number; costHealth?: number;
       specialCostJson?: Record<string, unknown>;
       rewardGold?: number; rewardReputation?: number;
+      rewardJson?: Record<string, unknown>;
     }[];
   }
 
@@ -101,15 +102,26 @@ async function main() {
     { name: "Treasure Map", cardType: "device", pool: "dynamic", costGold: 5, description: "Points to riches. And card draws.", totalQuantity: 3, effects: [{ displayOrder: 0, effectType: "gain_movement", amount: 2 }, { displayOrder: 1, effectType: "draw_cards", amount: 1 }] },
     { name: "Scout", cardType: "companion", pool: "dynamic", costGold: 3, description: "Sees what others miss.", totalQuantity: 3, effects: [{ displayOrder: 0, effectType: "draw_cards", amount: 2 }] },
     { name: "War Drum", cardType: "device", pool: "dynamic", costGold: 4, description: "Loud. Effective. Loud.", totalQuantity: 3, effects: [{ displayOrder: 0, effectType: "gain_attack", amount: 1 }, { displayOrder: 1, effectType: "gain_attention", amount: 1 }] },
-    { name: "Cave Bat", cardType: "monster", pool: "dynamic", costGold: 4, description: "Fast. Squeaky. Useful.", totalQuantity: 3, effects: [{ displayOrder: 0, effectType: "gain_movement", amount: 2 }, { displayOrder: 1, effectType: "gain_attention", amount: 1 }] },
-    { name: "Ogre Brute", cardType: "monster", pool: "dynamic", costGold: 7, description: "Big. Strong. Subtle as a brick.", totalQuantity: 2, effects: [{ displayOrder: 0, effectType: "gain_attack", amount: 3 }, { displayOrder: 1, effectType: "gain_attention", amount: 1 }] },
+    { name: "Cave Bat", cardType: "monster", pool: "dynamic", costGold: 0, isKillableThreat: true, description: "A shrieking swarm. Fast and disorienting.", totalQuantity: 3, resolutionOptions: [
+      { label: "Fight", displayOrder: 0, costAttacks: 1, rewardGold: 2 },
+    ]},
+    { name: "Ogre Brute", cardType: "monster", pool: "dynamic", costGold: 0, isKillableThreat: true, description: "A wall of muscle and bad intentions.", totalQuantity: 2, resolutionOptions: [
+      { label: "Fight", displayOrder: 0, costAttacks: 3, rewardGold: 4 },
+    ]},
     { name: "Bag of Loot", cardType: "device", pool: "dynamic", costGold: 5, description: "A heavy sack — coins and a quick step.", totalQuantity: 3, effects: [{ displayOrder: 0, effectType: "gain_gold", amount: 2 }, { displayOrder: 1, effectType: "gain_movement", amount: 1 }] },
     { name: "Map Fragment", cardType: "device", pool: "dynamic", costGold: 3, description: "A torn corner of a larger map.", totalQuantity: 4, effects: [{ displayOrder: 0, effectType: "gain_movement", amount: 1 }, { displayOrder: 1, effectType: "draw_cards", amount: 1 }] },
-    { name: "Cultist", cardType: "monster", pool: "dynamic", costGold: 5, description: "A profitable but suspicious arrangement.", totalQuantity: 3, effects: [{ displayOrder: 0, effectType: "gain_gold", amount: 2 }, { displayOrder: 1, effectType: "gain_attention", amount: 1 }] },
+    { name: "Cultist", cardType: "monster", pool: "dynamic", costGold: 0, isKillableThreat: true, description: "A fanatic offering a deal. Fight or pay the price.", totalQuantity: 3, resolutionOptions: [
+      { label: "Fight", displayOrder: 0, costAttacks: 2, rewardGold: 3, rewardReputation: 1 },
+      { label: "Sacrifice", displayOrder: 1, costHealth: 2, rewardGold: 5, rewardReputation: 2 },
+    ]},
 
     // ---- Dynamic: broad effects ----
-    { name: "Imp Saboteur", cardType: "monster", pool: "dynamic", costGold: 4, description: "Gain 1 gold. Every other player gains 1 attention.", totalQuantity: 3, effects: [{ displayOrder: 0, effectType: "gain_gold", amount: 1 }, { displayOrder: 1, effectType: "all_others_gain_attention", amount: 1 }] },
-    { name: "Goblin Trickster", cardType: "monster", pool: "dynamic", costGold: 5, description: "Loves making trouble. Every other player gains 1 attention.", totalQuantity: 3, effects: [{ displayOrder: 0, effectType: "gain_gold", amount: 1 }, { displayOrder: 1, effectType: "all_others_gain_attention", amount: 1 }] },
+    { name: "Imp Saboteur", cardType: "monster", pool: "dynamic", costGold: 0, isKillableThreat: true, description: "A sneaky little wretch. Defeat it before it causes more trouble.", totalQuantity: 3, resolutionOptions: [
+      { label: "Fight", displayOrder: 0, costAttacks: 1, rewardGold: 2 },
+    ]},
+    { name: "Goblin Trickster", cardType: "monster", pool: "dynamic", costGold: 0, isKillableThreat: true, description: "Cackles as it dies. Defeating it is satisfying but loud.", totalQuantity: 3, resolutionOptions: [
+      { label: "Fight", displayOrder: 0, costAttacks: 2, rewardGold: 3, rewardReputation: 1, rewardJson: { gain_attention: 1 } },
+    ]},
     { name: "Pickpocket", cardType: "companion", pool: "dynamic", costGold: 5, description: "Nimble fingers. Every other player loses 1 gold this turn.", totalQuantity: 3, effects: [{ displayOrder: 0, effectType: "gain_gold", amount: 2 }, { displayOrder: 1, effectType: "all_others_lose_gold_this_turn", amount: 1 }] },
 
     // ---- Dynamic: turn modifiers ----
@@ -212,6 +224,7 @@ async function main() {
               specialCostJson: (opt.specialCostJson ?? {}) as never,
               rewardGold: opt.rewardGold ?? 0,
               rewardReputation: opt.rewardReputation ?? 0,
+              rewardJson: (opt.rewardJson ?? {}) as never,
             },
           });
         }

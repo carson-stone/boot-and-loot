@@ -134,6 +134,7 @@ export interface ResolutionOptionView {
   specialCostJson: Record<string, unknown>;
   rewardGold: number;
   rewardReputation: number;
+  rewardJson: Record<string, unknown>;
 }
 
 export interface ArtifactView {

@@ -204,6 +204,7 @@ model CardResolutionOption {
   specialCostJson  Json   @default("{}") @map("special_cost_json")
   rewardGold       Int    @default(0) @map("reward_gold")
   rewardReputation Int    @default(0) @map("reward_reputation")
+  rewardJson       Json   @default("{}") @map("reward_json")
 
   cardDefinition CardDefinition @relation(fields: [cardDefinitionId], references: [id], onDelete: Cascade)
 

@@ -81,6 +81,17 @@ export async function resolveThreat(
       await tx.player.update({ where: { id: playerId }, data: playerUpdate });
     }
 
+    // Apply reward_json effects (separate update to avoid field conflicts)
+    const rewardJson = option.rewardJson as Record<string, unknown>;
+    if (typeof rewardJson.remove_attention === "number" && rewardJson.remove_attention > 0) {
+      const current = await tx.player.findUniqueOrThrow({ where: { id: playerId }, select: { attentionPoints: true } });
+      const removed = Math.min(current.attentionPoints, rewardJson.remove_attention);
+      if (removed > 0) await tx.player.update({ where: { id: playerId }, data: { attentionPoints: { decrement: removed } } });
+    }
+    if (typeof rewardJson.gain_attention === "number" && rewardJson.gain_attention > 0) {
+      await tx.player.update({ where: { id: playerId }, data: { attentionPoints: { increment: rewardJson.gain_attention } } });
+    }
+
     // Trash the threat card
     await tx.gameCard.update({
       where: { id: gameCardId },

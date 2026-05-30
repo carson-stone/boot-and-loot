@@ -426,6 +426,7 @@ export async function loadGameState(gameId: string, requestingPlayerId?: string)
         specialCostJson: o.specialCostJson as Record<string, unknown>,
         rewardGold: o.rewardGold,
         rewardReputation: o.rewardReputation,
+        rewardJson: o.rewardJson as Record<string, unknown>,
       })),
     })),
     staticMarket,

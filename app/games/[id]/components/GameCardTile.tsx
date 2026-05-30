@@ -130,6 +130,8 @@ export function GameCardTile({ card, action }: GameCardTileProps) {
               {[
                 opt.rewardGold > 0 && `💰 ${opt.rewardGold}`,
                 opt.rewardReputation > 0 && `🏆 ${opt.rewardReputation}`,
+                typeof opt.rewardJson.remove_attention === "number" && opt.rewardJson.remove_attention > 0 && `👁 −${opt.rewardJson.remove_attention}`,
+                typeof opt.rewardJson.gain_attention === "number" && opt.rewardJson.gain_attention > 0 && `👁 +${opt.rewardJson.gain_attention}`,
               ]
                 .filter(Boolean)
                 .join(" + ") || "—"}
