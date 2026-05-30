@@ -21,6 +21,7 @@ export async function POST(
     if (error instanceof GameError) {
       return NextResponse.json({ error: error.message, code: error.code }, { status: error.statusCode });
     }
-    throw error;
+    console.error("[API Error]", error);
+    return NextResponse.json({ error: "Internal server error", detail: String(error) }, { status: 500 });
   }
 }

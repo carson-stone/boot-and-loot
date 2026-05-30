@@ -319,12 +319,14 @@ async function main() {
     { from: "Whispering Tunnel", to: "Cursed Throne", bidirectional: true, cost: 1, requiresTool: null, description: null },
     { from: "Spider Nest", to: "Venom Vault", bidirectional: true, cost: 1, requiresTool: null, description: null },
     { from: "Spider Nest", to: "Cursed Throne", bidirectional: true, cost: 1, requiresTool: null, description: null },
-    { from: "Forgotten Library", to: "Ossuary", bidirectional: true, cost: 1, requiresTool: "skeleton_key", description: "Sealed archway" },
+    { from: "Forgotten Library", to: "Ossuary", bidirectional: true, cost: 1, requiresTool: null, description: null },
     { from: "Sunken Reliquary", to: "Cursed Throne", bidirectional: true, cost: 1, requiresTool: "skeleton_key", description: "Sealed archway" },
     { from: "Sunken Reliquary", to: "Drowned Crypt", bidirectional: true, cost: 1, requiresTool: null, description: null },
     { from: "Cursed Throne", to: "Venom Vault", bidirectional: true, cost: 1, requiresTool: null, description: null },
     { from: "Cursed Throne", to: "Throne Antechamber", bidirectional: true, cost: 1, requiresTool: null, description: null },
-    { from: "Drowned Crypt", to: "Throne Antechamber", bidirectional: true, cost: 1, requiresTool: "skeleton_key", description: "Cross-passage" },
+    { from: "Cursed Throne", to: "Drowned Crypt", bidirectional: false, cost: 1, requiresTool: null, description: "Crumbling ledge — one-way drop" },
+    { from: "Drowned Crypt", to: "Throne Antechamber", bidirectional: true, cost: 1, requiresTool: null, description: null },
+    { from: "Antechamber", to: "Burial Chamber", bidirectional: false, cost: 1, requiresTool: null, description: "Collapsed shaft — one-way drop" },
     { from: "Venom Vault", to: "Throne Antechamber", bidirectional: true, cost: 1, requiresTool: null, description: null },
   ];
 
