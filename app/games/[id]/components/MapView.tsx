@@ -61,6 +61,8 @@ export function MapView({ map, players, currentPlayerId, isMyTurn, onMove, onPic
               const isOneWay = !map.connections.some(
                 (c2) => c2.fromRoomId === conn.toRoomId && c2.toRoomId === conn.fromRoomId,
               );
+              const mx = (fc.x + tc.x) / 2;
+              const my = (fc.y + tc.y) / 2;
               return (
                 <g key={i}>
                   <line
@@ -70,14 +72,19 @@ export function MapView({ map, players, currentPlayerId, isMyTurn, onMove, onPic
                     y2={tc.y}
                     stroke={conn.requiresTool ? "#dc2626" : "#94a3b8"}
                     strokeWidth={conn.requiresTool ? 2 : 1}
-                    strokeDasharray={conn.requiresTool ? "4,2" : undefined}
+                    strokeDasharray={conn.requiresTool ? "6,3" : undefined}
                   />
                   {isOneWay && (
                     <polygon
-                      points={`${(fc.x + tc.x) / 2 - 6},${(fc.y + tc.y) / 2 - 6} ${(fc.x + tc.x) / 2 + 6},${(fc.y + tc.y) / 2} ${(fc.x + tc.x) / 2 - 6},${(fc.y + tc.y) / 2 + 6}`}
+                      points={`${mx - 6},${my - 6} ${mx + 6},${my} ${mx - 6},${my + 6}`}
                       fill="#94a3b8"
-                      transform={`rotate(${Math.atan2(tc.y - fc.y, tc.x - fc.x) * (180 / Math.PI)}, ${(fc.x + tc.x) / 2}, ${(fc.y + tc.y) / 2})`}
+                      transform={`rotate(${Math.atan2(tc.y - fc.y, tc.x - fc.x) * (180 / Math.PI)}, ${mx}, ${my})`}
                     />
+                  )}
+                  {conn.requiresTool && (
+                    <text x={mx} y={my + 5} textAnchor="middle" fontSize="14">
+                      🔑
+                    </text>
                   )}
                 </g>
               );
