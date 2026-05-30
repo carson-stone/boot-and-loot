@@ -97,6 +97,16 @@ async function main() {
     { name: "Hired Hand", cardType: "companion", pool: "static", costFocus: 3, description: "A useful traveling friend.", totalQuantity: 10, effects: [{ displayOrder: 0, effectType: "gain_focus", amount: 1 }, { displayOrder: 1, effectType: "draw_cards", amount: 1 }] },
 
     // ---- Dynamic: standard ----
+    { name: "Stolen Lantern", cardType: "device", pool: "dynamic", costFocus: 4, description: "Borrowed light, borrowed speed. Gain 3 movement.", totalQuantity: 3, effects: [{ displayOrder: 0, effectType: "gain_movement", amount: 3 }] },
+    { name: "Rope", cardType: "device", pool: "dynamic", costFocus: 3, description: "Useful in the dark. Gain 2 movement and make less noise this turn.", totalQuantity: 3, effects: [{ displayOrder: 0, effectType: "gain_movement", amount: 2 }, { displayOrder: 1, effectType: "reduce_attention_generated_this_turn", amount: 1 }] },
+    { name: "Flask of Fire", cardType: "device", pool: "dynamic", costFocus: 4, description: "Hurled into the dark — chaos follows. Gain 2 attack; every other player gains 1 attention.", totalQuantity: 3, effects: [{ displayOrder: 0, effectType: "gain_attack", amount: 2 }, { displayOrder: 1, effectType: "all_others_gain_attention", amount: 1 }] },
+    { name: "Thieves' Tools", cardType: "device", pool: "dynamic", costFocus: 5, description: "A lockpick, a pry bar, and quick hands. Gain 1 focus and 2 attack.", totalQuantity: 3, effects: [{ displayOrder: 0, effectType: "gain_focus", amount: 1 }, { displayOrder: 1, effectType: "gain_attack", amount: 2 }] },
+    { name: "Trinket", cardType: "device", pool: "dynamic", costFocus: 2, description: "Worthless, but it keeps your hands busy. Draw 1 card.", totalQuantity: 4, effects: [{ displayOrder: 0, effectType: "draw_cards", amount: 1 }] },
+    { name: "Heavy Crossbow", cardType: "device", pool: "dynamic", costFocus: 6, description: "Devastating range. Terrible subtlety. Gain 4 attack and 1 attention.", totalQuantity: 2, effects: [{ displayOrder: 0, effectType: "gain_attack", amount: 4 }, { displayOrder: 1, effectType: "gain_attention", amount: 1 }] },
+    { name: "Grizzled Veteran", cardType: "companion", pool: "dynamic", costFocus: 5, description: "Seen it all. Hit it all. Gain 3 attack; his war stories draw 1 attention.", totalQuantity: 3, effects: [{ displayOrder: 0, effectType: "gain_attack", amount: 3 }, { displayOrder: 1, effectType: "gain_attention", amount: 1 }] },
+    { name: "Tracker", cardType: "companion", pool: "dynamic", costFocus: 4, description: "Reads the dungeon like a book. Gain 1 movement and draw 1 card.", totalQuantity: 3, effects: [{ displayOrder: 0, effectType: "gain_movement", amount: 1 }, { displayOrder: 1, effectType: "draw_cards", amount: 1 }] },
+    { name: "Fence", cardType: "companion", pool: "dynamic", costFocus: 3, description: "Turns contraband into opportunity. Gain 1 gold and 1 focus.", totalQuantity: 3, effects: [{ displayOrder: 0, effectType: "gain_gold", amount: 1 }, { displayOrder: 1, effectType: "gain_focus", amount: 1 }] },
+    { name: "Tomb Raider", cardType: "companion", pool: "dynamic", costFocus: 6, costGold: 1, description: "Expensive company, but she pays for herself. Gain 2 focus and draw 2 cards.", totalQuantity: 2, effects: [{ displayOrder: 0, effectType: "gain_focus", amount: 2 }, { displayOrder: 1, effectType: "draw_cards", amount: 2 }] },
     { name: "Gold Pouch", cardType: "device", pool: "dynamic", costFocus: 5, description: "A heavy purse.", totalQuantity: 4, effects: [{ displayOrder: 0, effectType: "gain_gold", amount: 3 }] },
     { name: "Lantern Bearer", cardType: "companion", pool: "dynamic", costFocus: 4, description: "Light and a stout arm.", totalQuantity: 3, effects: [{ displayOrder: 0, effectType: "gain_movement", amount: 1 }, { displayOrder: 1, effectType: "gain_attack", amount: 1 }] },
     { name: "Veteran Mercenary", cardType: "companion", pool: "dynamic", costFocus: 4, costGold: 2, description: "Battle-tested. Worth the coin — and some gold.", totalQuantity: 3, effects: [{ displayOrder: 0, effectType: "gain_gold", amount: 1 }, { displayOrder: 1, effectType: "gain_attack", amount: 2 }] },
@@ -126,12 +136,16 @@ async function main() {
     { name: "Pickpocket", cardType: "companion", pool: "dynamic", costFocus: 5, description: "Nimble fingers. Gain focus and permanently lift a gold coin from every other player.", totalQuantity: 3, effects: [{ displayOrder: 0, effectType: "gain_focus", amount: 2 }, { displayOrder: 1, effectType: "all_others_lose_gold", amount: 1 }] },
 
     // ---- Dynamic: turn modifiers ----
+    { name: "Focus Crystal", cardType: "device", pool: "dynamic", costFocus: 6, description: "A shard of pure will. Doubles all focus you generate this turn — retroactively.", totalQuantity: 2, effects: [{ displayOrder: 0, effectType: "multiply_focus_this_turn", amount: 2 }] },
+    { name: "Mirror Shield", cardType: "device", pool: "dynamic", costFocus: 5, description: "Bash and deflect. Gain 1 attack and prevent 2 damage this turn.", totalQuantity: 3, effects: [{ displayOrder: 0, effectType: "gain_attack", amount: 1 }, { displayOrder: 1, effectType: "prevent_damage_this_turn", amount: 2 }] },
     { name: "Crystal Charm", cardType: "device", pool: "dynamic", costFocus: 6, description: "Reduces all attention you generate this turn by 1.", totalQuantity: 2, effects: [{ displayOrder: 0, effectType: "reduce_attention_generated_this_turn", amount: 1 }] },
     { name: "Iron Buckler", cardType: "device", pool: "dynamic", costFocus: 5, description: "Bash and block. Prevents 1 damage this turn.", totalQuantity: 3, effects: [{ displayOrder: 0, effectType: "gain_attack", amount: 1 }, { displayOrder: 1, effectType: "prevent_damage_this_turn", amount: 1 }] },
     { name: "Battle Standard", cardType: "device", pool: "dynamic", costFocus: 5, description: "Rally your allies. If you play 2 or more companions this turn, gain +2 attack.", totalQuantity: 2, effects: [{ displayOrder: 0, effectType: "gain_attack", amount: 1 }, { displayOrder: 1, effectType: "conditional_gain_attack_if_card_type_played", amount: 0, parametersJson: { card_type: "companion", threshold: 2, bonus: 2 } }] },
     { name: "Shadow Cloak", cardType: "device", pool: "dynamic", costFocus: 7, isOneTimeUse: true, description: "All cards you play this turn generate 0 attention.", totalQuantity: 2, effects: [{ displayOrder: 0, effectType: "all_cards_zero_attention_this_turn", amount: 0 }] },
 
     // ---- Dynamic: one-time-use ----
+    { name: "Antidote", cardType: "device", pool: "dynamic", costFocus: 3, isOneTimeUse: true, description: "Purge the poison. Remove 3 attention and heal 1 health.", totalQuantity: 3, effects: [{ displayOrder: 0, effectType: "remove_attention", amount: 3 }, { displayOrder: 1, effectType: "heal", amount: 1 }] },
+    { name: "Flash Powder", cardType: "device", pool: "dynamic", costFocus: 4, isOneTimeUse: true, description: "A blinding detonation. Every other player gains 2 attention while you slip away with 2 focus.", totalQuantity: 2, effects: [{ displayOrder: 0, effectType: "all_others_gain_attention", amount: 2 }, { displayOrder: 1, effectType: "gain_focus", amount: 2 }] },
     { name: "Sleight of Hand", cardType: "device", pool: "dynamic", costFocus: 4, isOneTimeUse: true, description: "Slip away unnoticed. Remove 2 attention from your pool.", totalQuantity: 3, effects: [{ displayOrder: 0, effectType: "remove_attention", amount: 2 }] },
     { name: "Smoke Bomb", cardType: "device", pool: "dynamic", costFocus: 6, isOneTimeUse: true, description: "A puff of cover and a quick exit.", totalQuantity: 2, effects: [{ displayOrder: 0, effectType: "gain_movement", amount: 2 }, { displayOrder: 1, effectType: "remove_attention", amount: 3 }] },
     { name: "Healing Draught", cardType: "device", pool: "dynamic", costFocus: 4, isOneTimeUse: true, description: "Heal 3 health.", totalQuantity: 3, effects: [{ displayOrder: 0, effectType: "heal", amount: 3 }] },
@@ -142,6 +156,10 @@ async function main() {
     { name: "Wandering Merchant", cardType: "companion", pool: "dynamic", costFocus: 6, description: "Brings the market wherever he goes.", totalQuantity: 2, effects: [{ displayOrder: 0, effectType: "gain_focus", amount: 1 }, { displayOrder: 1, effectType: "grant_market_access_this_turn", amount: 0 }] },
 
     // ---- Dynamic: spells (single-use when played; go to discard on purchase) ----
+    { name: "Stone Skin", cardType: "spell", pool: "dynamic", costFocus: 5, description: "Your flesh hardens to granite. Prevent 3 damage this turn.", totalQuantity: 3, effects: [{ displayOrder: 0, effectType: "prevent_damage_this_turn", amount: 3 }] },
+    { name: "Phase Step", cardType: "spell", pool: "dynamic", costFocus: 6, description: "Step between shadows. Gain 4 movement and remove 2 attention.", totalQuantity: 2, effects: [{ displayOrder: 0, effectType: "gain_movement", amount: 4 }, { displayOrder: 1, effectType: "remove_attention", amount: 2 }] },
+    { name: "Tremor", cardType: "spell", pool: "dynamic", costFocus: 5, description: "A shockwave through stone. You gain 3 attack; the rumble startles everyone else into 1 attention.", totalQuantity: 3, effects: [{ displayOrder: 0, effectType: "gain_attack", amount: 3 }, { displayOrder: 1, effectType: "all_others_gain_attention", amount: 1 }] },
+    { name: "Recall", cardType: "spell", pool: "dynamic", costFocus: 6, description: "The dungeon's secrets flood back to you. Draw 3 cards.", totalQuantity: 2, effects: [{ displayOrder: 0, effectType: "draw_cards", amount: 3 }] },
     { name: "Alchemy", cardType: "spell", pool: "dynamic", costFocus: 6, description: "Transmute your deck. Upgrades up to 3 Copper Coins in your discard or play area to Silver Coins. If you have no coppers, upgrades one Silver Coin to a Gold Pouch.", totalQuantity: 2, effects: [{ displayOrder: 0, effectType: "scripted", amount: 0, parametersJson: { script_id: "alchemy" } }] },
     { name: "Smelt", cardType: "spell", pool: "dynamic", costFocus: 4, description: "Melt down your copper. Converts up to 3 Copper Coins from your discard or play area into gold — then discards them permanently.", totalQuantity: 3, effects: [{ displayOrder: 0, effectType: "scripted", amount: 0, parametersJson: { script_id: "smelt" } }] },
     { name: "Arcane Surge", cardType: "spell", pool: "dynamic", costFocus: 5, description: "A torrent of raw Focus. Generates 4 Focus this turn.", totalQuantity: 3, effects: [{ displayOrder: 0, effectType: "gain_focus", amount: 4 }] },
@@ -150,7 +168,17 @@ async function main() {
     { name: "Battle Cry", cardType: "spell", pool: "dynamic", costFocus: 6, description: "A thunderous roar that steels your arm. Gain 4 attack this turn.", totalQuantity: 2, effects: [{ displayOrder: 0, effectType: "gain_attack", amount: 4 }] },
     { name: "Veil", cardType: "spell", pool: "dynamic", costFocus: 7, description: "Cloak yourself in silence. All cards generate 0 attention this turn, and remove 2 attention from your pool.", totalQuantity: 2, effects: [{ displayOrder: 0, effectType: "all_cards_zero_attention_this_turn", amount: 0 }, { displayOrder: 1, effectType: "remove_attention", amount: 2 }] },
 
-    // ---- Dynamic: killable threats ----
+    // ---- Dynamic: killable threats (non-horde) ----
+    { name: "Venomous Serpent", cardType: "monster", pool: "dynamic", isKillableThreat: true, description: "Coiled and patient. The bite costs more than the kill.", totalQuantity: 2, resolutionOptions: [
+      { label: "Fight", displayOrder: 0, costAttacks: 2, rewardGold: 3 },
+      { label: "Sacrifice", displayOrder: 1, costHealth: 1, rewardGold: 5, rewardReputation: 1 },
+    ]},
+    { name: "Phantom", cardType: "monster", pool: "dynamic", isKillableThreat: true, description: "Incorporeal and ancient. Steel barely slows it; gold does not buy its mercy cheaply.", totalQuantity: 2, resolutionOptions: [
+      { label: "Fight", displayOrder: 0, costAttacks: 4, rewardGold: 6, rewardReputation: 1 },
+      { label: "Bribe", displayOrder: 1, costGold: 5, rewardReputation: 3 },
+    ]},
+
+    // ---- Dynamic: killable threats (horde triggers) ----
     { name: "Restless Horde", cardType: "monster", pool: "dynamic", costGold: 0, triggersHorde: true, isKillableThreat: true, description: "Hazard. Triggers a horde attack on reveal, then sits as a killable threat.", totalQuantity: 4, resolutionOptions: [
       { label: "Fight", displayOrder: 0, costAttacks: 3, rewardGold: 4 },
       { label: "Bribe", displayOrder: 1, costGold: 5, rewardGold: 3, rewardReputation: 1 },
