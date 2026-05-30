@@ -86,11 +86,12 @@ async function main() {
 
   const cards: CardDef[] = [
     // ---- Starter ----
-    { name: "Copper Coin", cardType: "treasure", pool: "starter", description: "A simple coin. Basic income.", totalQuantity: 6, effects: [{ displayOrder: 0, effectType: "gain_gold", amount: 1 }] },
-    { name: "Walking Stick", cardType: "device", pool: "starter", costGold: 0, description: "Helps you cover ground.", totalQuantity: 3, effects: [{ displayOrder: 0, effectType: "gain_movement", amount: 1 }] },
-    { name: "Rusty Dagger", cardType: "device", pool: "starter", costGold: 0, description: "Better than fists. Barely.", totalQuantity: 1, effects: [{ displayOrder: 0, effectType: "gain_attack", amount: 1 }] },
+    { name: "Instinct", cardType: "device", pool: "starter", description: "Every adventurer starts with raw instinct. Generates the focus to act.", totalQuantity: 6, effects: [{ displayOrder: 0, effectType: "gain_focus", amount: 1 }] },
+    { name: "Walking Stick", cardType: "device", pool: "starter", description: "Helps you cover ground.", totalQuantity: 3, effects: [{ displayOrder: 0, effectType: "gain_movement", amount: 1 }] },
+    { name: "Rusty Dagger", cardType: "device", pool: "starter", description: "Better than fists. Barely.", totalQuantity: 1, effects: [{ displayOrder: 0, effectType: "gain_attack", amount: 1 }] },
 
     // ---- Static market ----
+    { name: "Copper Coin", cardType: "treasure", pool: "static", costFocus: 2, description: "A simple coin. Builds toward real wealth — slowly.", totalQuantity: 10, effects: [{ displayOrder: 0, effectType: "gain_gold", amount: 1 }] },
     { name: "Silver Coin", cardType: "treasure", pool: "static", costFocus: 3, description: "A better coin. Builds toward real wealth.", totalQuantity: 10, effects: [{ displayOrder: 0, effectType: "gain_gold", amount: 2 }] },
     { name: "Adventurer's Boots", cardType: "device", pool: "static", costFocus: 4, description: "Speed when you need it.", totalQuantity: 10, effects: [{ displayOrder: 0, effectType: "gain_movement", amount: 2 }] },
     { name: "Short Sword", cardType: "device", pool: "static", costFocus: 4, description: "Real steel.", totalQuantity: 10, effects: [{ displayOrder: 0, effectType: "gain_attack", amount: 2 }] },

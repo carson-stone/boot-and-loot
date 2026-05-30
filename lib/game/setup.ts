@@ -105,8 +105,8 @@ export async function startGame(gameId: string) {
       const starterCards: { gameId: string; cardDefinitionId: string; location: "player_deck"; playerId: string; deckPosition: number }[] = [];
       let pos = 0;
       for (const def of starterDefs) {
-        const qty = def.name === "Copper Coin" ? 6 : def.name === "Walking Stick" ? 3 : 1;
-        for (let i = 0; i < qty; i++) {
+        // totalQuantity on starter cards is the per-player count
+        for (let i = 0; i < def.totalQuantity; i++) {
           starterCards.push({
             gameId,
             cardDefinitionId: def.id,
