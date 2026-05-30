@@ -109,16 +109,16 @@ export function MarketPanel({
           </CardTitle>
         </CardHeader>
         <CardContent className="px-4 pb-4">
-          <div className="flex gap-3 flex-wrap">
+          <div className="flex flex-col gap-2">
             {[
               { code: "skeleton_key", name: "Skeleton Key", cost: 8, description: "Unlocks all key-gated passages permanently.", icon: "🔑" },
               { code: "backpack", name: "Backpack", cost: 10, description: "Carry up to 2 artifacts.", icon: "🎒" },
             ].map((tool) => {
               const owned = myTools.includes(tool.code);
               return (
-                <div key={tool.code} className={`flex items-center gap-3 rounded-lg border px-4 py-3 ${owned ? "border-green-700 bg-green-950/30" : "border-stone-600 bg-stone-800/60"}`}>
+                <div key={tool.code} className={`flex items-center gap-3 rounded-lg border px-4 py-3 w-full ${owned ? "border-green-700 bg-green-950/30" : "border-stone-600 bg-stone-800/60"}`}>
                   <span className="text-2xl shrink-0">{tool.icon}</span>
-                  <div className="min-w-0">
+                  <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2">
                       <span className="font-display text-sm text-stone-100 font-semibold">{tool.name}</span>
                       {owned
@@ -128,7 +128,7 @@ export function MarketPanel({
                     <p className="text-xs text-stone-400 mt-0.5">{tool.description}</p>
                   </div>
                   {!owned && (
-                  <div className="shrink-0 ml-2">
+                  <div className="shrink-0 ml-auto">
                     <Button
                       size="sm"
                       variant="outline"
