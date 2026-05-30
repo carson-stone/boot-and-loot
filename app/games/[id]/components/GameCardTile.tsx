@@ -45,8 +45,10 @@ function effectLabel(e: EffectView): string {
     case "reduce_attention_generated_this_turn": return `👁 −${n} generated`;
     case "all_cards_zero_attention_this_turn":   return `👁 0 this turn`;
     case "prevent_damage_this_turn":             return `🛡 ${n} dmg prevented`;
-    case "conditional_gain_attack_if_monsters_played":
-      return `⚔️ +${(e.parametersJson as Record<string,number>).bonus} (3+ monsters)`;
+    case "conditional_gain_attack_if_card_type_played": {
+      const p = e.parametersJson as Record<string, unknown>;
+      return `⚔️ +${p.bonus} (${p.threshold}+ ${p.card_type}s)`;
+    }
     case "grant_market_access_this_turn":        return `🏪 market access`;
     default: return type.replace(/_/g, " ");
   }

@@ -42,7 +42,7 @@ export type CardEffect =
   | { type: "prevent_damage_this_turn";      amount: number }
 
   // ---- Conditional ----
-  | { type: "conditional_gain_attack_if_monsters_played"; threshold: number; bonus: number }
+  | { type: "conditional_gain_attack_if_card_type_played"; card_type: "monster" | "device" | "companion"; threshold: number; bonus: number }
 
   // ---- Card-level special ----
   | { type: "grant_market_access_this_turn" }
@@ -327,8 +327,10 @@ export function applyEffect(
     }
 
     // ---- Conditional ----
-    case "conditional_gain_attack_if_monsters_played": {
-      if (ctx.playCounts.monsters >= effect.threshold) {
+    case "conditional_gain_attack_if_card_type_played": {
+      const count = ctx.playCounts[effect.card_type === "monster" ? "monsters"
+        : effect.card_type === "companion" ? "companions" : "devices"];
+      if (count >= effect.threshold) {
         const bonus = effect.bonus * ctx.modifiers.attackMultiplier;
         delta.turnResourceChanges.attacks =
           (delta.turnResourceChanges.attacks ?? 0) + bonus;
@@ -444,9 +446,10 @@ function rowToEffect(row: CardEffectRow): CardEffect {
     case "grant_market_access_this_turn":
       return { type: effect_type } as CardEffect;
 
-    case "conditional_gain_attack_if_monsters_played":
+    case "conditional_gain_attack_if_card_type_played":
       return {
-        type: "conditional_gain_attack_if_monsters_played",
+        type: "conditional_gain_attack_if_card_type_played",
+        card_type: String(parameters_json.card_type) as "monster" | "device" | "companion",
         threshold: Number(parameters_json.threshold),
         bonus: Number(parameters_json.bonus),
       };

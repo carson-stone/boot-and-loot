@@ -197,27 +197,29 @@ test("order-independence: +3 gold then ×2 == ×2 then +3 gold", () => {
 
 console.log("\n=== CONDITIONAL EFFECTS ===");
 
-test("Battle Standard: no bonus when fewer than 3 monsters played", () => {
+test("Battle Standard: no bonus when fewer than 2 companions played", () => {
   const ctx = makeCtx({
-    playCounts: { monsters: 2, devices: 0, companions: 0 },
+    playCounts: { monsters: 0, devices: 0, companions: 1 },
   });
   const delta = new StateDelta();
   applyEffect({
-    type: "conditional_gain_attack_if_monsters_played",
-    threshold: 3,
+    type: "conditional_gain_attack_if_card_type_played",
+    card_type: "companion",
+    threshold: 2,
     bonus: 2,
   }, ctx, delta);
   assertEqual(delta.turnResourceChanges.attacks ?? 0, 0, "no bonus");
 });
 
-test("Battle Standard: bonus applies at threshold", () => {
+test("Battle Standard: bonus applies when 2+ companions played", () => {
   const ctx = makeCtx({
-    playCounts: { monsters: 3, devices: 0, companions: 0 },
+    playCounts: { monsters: 0, devices: 0, companions: 2 },
   });
   const delta = new StateDelta();
   applyEffect({
-    type: "conditional_gain_attack_if_monsters_played",
-    threshold: 3,
+    type: "conditional_gain_attack_if_card_type_played",
+    card_type: "companion",
+    threshold: 2,
     bonus: 2,
   }, ctx, delta);
   assertEqual(delta.turnResourceChanges.attacks ?? 0, 2, "+2 attack bonus");
@@ -290,16 +292,17 @@ test("parseCardEffects sorts by display_order and maps types", () => {
 test("parseCardEffects: conditional pulls from parameters_json", () => {
   const rows = [{
     display_order: 0,
-    effect_type: "conditional_gain_attack_if_monsters_played",
+    effect_type: "conditional_gain_attack_if_card_type_played",
     amount: 0,
-    parameters_json: { threshold: 3, bonus: 2 },
+    parameters_json: { card_type: "companion", threshold: 2, bonus: 2 },
   }];
   const effects = parseCardEffects(rows);
   const e = effects[0];
-  if (e?.type !== "conditional_gain_attack_if_monsters_played") {
+  if (e?.type !== "conditional_gain_attack_if_card_type_played") {
     throw new Error("wrong type discriminator");
   }
-  assertEqual(e.threshold, 3, "threshold");
+  assertEqual(e.card_type, "companion", "card_type");
+  assertEqual(e.threshold, 2, "threshold");
   assertEqual(e.bonus, 2, "bonus");
 });
 

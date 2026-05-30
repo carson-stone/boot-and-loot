@@ -127,7 +127,7 @@ async function main() {
     // ---- Dynamic: turn modifiers ----
     { name: "Crystal Charm", cardType: "device", pool: "dynamic", costGold: 6, description: "Reduces all attention you generate this turn by 1.", totalQuantity: 2, effects: [{ displayOrder: 0, effectType: "reduce_attention_generated_this_turn", amount: 1 }] },
     { name: "Iron Buckler", cardType: "device", pool: "dynamic", costGold: 5, description: "Bash and block. Prevents 1 damage this turn.", totalQuantity: 3, effects: [{ displayOrder: 0, effectType: "gain_attack", amount: 1 }, { displayOrder: 1, effectType: "prevent_damage_this_turn", amount: 1 }] },
-    { name: "Battle Standard", cardType: "device", pool: "dynamic", costGold: 5, description: "If you play 3 or more monsters this turn, gain +2 attack.", totalQuantity: 2, effects: [{ displayOrder: 0, effectType: "gain_attack", amount: 1 }, { displayOrder: 1, effectType: "conditional_gain_attack_if_monsters_played", amount: 0, parametersJson: { threshold: 3, bonus: 2 } }] },
+    { name: "Battle Standard", cardType: "device", pool: "dynamic", costGold: 5, description: "Rally your allies. If you play 2 or more companions this turn, gain +2 attack.", totalQuantity: 2, effects: [{ displayOrder: 0, effectType: "gain_attack", amount: 1 }, { displayOrder: 1, effectType: "conditional_gain_attack_if_card_type_played", amount: 0, parametersJson: { card_type: "companion", threshold: 2, bonus: 2 } }] },
     { name: "Shadow Cloak", cardType: "device", pool: "dynamic", costGold: 7, isOneTimeUse: true, description: "One-time: all cards you play this turn generate 0 attention.", totalQuantity: 2, effects: [{ displayOrder: 0, effectType: "all_cards_zero_attention_this_turn", amount: 0 }] },
 
     // ---- Dynamic: one-time-use ----
