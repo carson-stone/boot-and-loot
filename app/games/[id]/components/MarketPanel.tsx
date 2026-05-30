@@ -34,11 +34,11 @@ export function MarketPanel({
   const canBuyTools = isMyTurn && myRoomIsMarket;
 
   return (
-    <div className="grid grid-cols-3 gap-4">
-      {/* Card Offers */}
+    <div className="grid gap-4" style={{ gridTemplateColumns: "1fr 1fr auto" }}>
+      {/* Loot */}
       <Card>
         <CardHeader className="pb-2 pt-3 px-4">
-          <CardTitle className="text-sm">Card Offers</CardTitle>
+          <CardTitle className="text-sm">Loot</CardTitle>
         </CardHeader>
         <CardContent className="px-4 pb-4">
           {cardOffers.length === 0 ? (
@@ -75,10 +75,10 @@ export function MarketPanel({
         </CardContent>
       </Card>
 
-      {/* Standard Cards */}
+      {/* Essentials */}
       <Card>
         <CardHeader className="pb-2 pt-3 px-4">
-          <CardTitle className="text-sm">Standard Cards</CardTitle>
+          <CardTitle className="text-sm">Essentials</CardTitle>
         </CardHeader>
         <CardContent className="px-4 pb-4">
           <div className="flex gap-3 overflow-x-auto pb-1">
@@ -89,7 +89,7 @@ export function MarketPanel({
                 action={{
                   label: "Buy",
                   variant: "outline",
-                  disabled: !isMyTurn || myGold < card.costGold || card.available === 0,
+                  disabled: !isMyTurn || myFocus < card.costFocus || myGold < card.costGold || card.available === 0,
                   onClick: () => onBuyCard({ cardDefinitionId: card.cardDefinitionId }),
                 }}
               />
@@ -102,7 +102,7 @@ export function MarketPanel({
       <Card>
         <CardHeader className="pb-2 pt-3 px-4">
           <CardTitle className="text-sm">
-            Tools{" "}
+            Market{" "}
             {!myRoomIsMarket && (
               <span className="text-xs font-normal text-slate-500">— visit a market room</span>
             )}
