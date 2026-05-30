@@ -11,73 +11,59 @@ interface Props {
 }
 
 export function HoverHand({ hand, isMyTurn, onPlay }: Props) {
-  const [pinned, setPinned] = useState(false);
-  const [hovered, setHovered] = useState(false);
-  const open = pinned || hovered;
+  const [open, setOpen] = useState(true);
 
   return (
-    <div
-      className="fixed left-0 top-1/2 -translate-y-1/2 z-40 flex"
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-    >
-      {/* Expanded panel */}
-      <div
-        className={`transition-all duration-300 overflow-hidden ${
-          open ? "w-52 opacity-100" : "w-0 opacity-0"
-        }`}
-      >
-        <div className="w-52 min-h-[300px] max-h-[90vh] overflow-y-auto bg-stone-900 border-r border-stone-600 shadow-2xl flex flex-col gap-2 p-2">
-          <div className="flex items-center justify-between mb-1 px-1">
-            <span className="font-display text-sm font-semibold tracking-wide text-amber-200">Hand</span>
+    <div className="flex shrink-0 self-stretch">
+      {/* Expanded card list */}
+      {open && (
+        <div className="w-52 flex flex-col gap-2 bg-stone-900 border border-stone-700 rounded-lg p-2 overflow-y-auto max-h-[calc(100vh-200px)]">
+          <div className="flex items-center justify-between px-1 mb-1">
+            <span className="font-display text-sm font-semibold tracking-wide text-amber-200">
+              Hand {hand.length > 0 && `(${hand.length})`}
+            </span>
             <button
-              onClick={() => setPinned(!pinned)}
-              className={`text-[10px] px-1.5 py-0.5 rounded border transition-colors ${
-                pinned
-                  ? "border-amber-500 text-amber-300 bg-amber-900/40"
-                  : "border-stone-600 text-stone-300 hover:text-stone-300"
-              }`}
-              title={pinned ? "Unpin hand" : "Pin hand open"}
+              onClick={() => setOpen(false)}
+              className="text-xs text-stone-500 hover:text-stone-300 transition-colors"
+              title="Collapse hand"
             >
-              {pinned ? "📌" : "pin"}
+              ◀
             </button>
           </div>
-
           {hand.length === 0 ? (
-            <p className="text-stone-300 text-xs px-1 italic">Empty hand</p>
+            <p className="text-stone-400 text-xs px-1 italic">Empty hand</p>
           ) : (
             hand.map((card) => (
-              <div key={card.gameCardId} className="shrink-0">
-                <GameCardTile
-                  card={card}
-                  action={{
-                    label: "Play",
-                    variant: "default",
-                    disabled: !isMyTurn,
-                    onClick: () => onPlay(card.gameCardId),
-                  }}
-                />
-              </div>
+              <GameCardTile
+                key={card.gameCardId}
+                card={card}
+                action={{
+                  label: "Play",
+                  variant: "default",
+                  disabled: !isMyTurn,
+                  onClick: () => onPlay(card.gameCardId),
+                }}
+              />
             ))
           )}
         </div>
-      </div>
+      )}
 
       {/* Collapsed tab */}
-      <div
-        className={`flex flex-col items-center justify-center cursor-pointer transition-all duration-200
-          bg-stone-800 border border-l-0 border-stone-600 rounded-r-lg shadow-lg
-          ${open ? "w-6" : "w-8"}`}
-        style={{ minHeight: "80px" }}
-        onClick={() => setPinned(!pinned)}
-      >
-        <span
-          className="font-display text-amber-200 text-xs font-semibold tracking-wide"
-          style={{ writingMode: "vertical-rl", transform: "rotate(180deg)" }}
+      {!open && (
+        <button
+          onClick={() => setOpen(true)}
+          className="w-9 flex flex-col items-center justify-center bg-stone-900 border border-stone-700 rounded-lg hover:border-amber-700 transition-colors cursor-pointer"
+          title="Expand hand"
         >
-          Hand {hand.length > 0 ? `(${hand.length})` : ""}
-        </span>
-      </div>
+          <span
+            className="font-display text-amber-200 text-xs font-semibold tracking-wide select-none"
+            style={{ writingMode: "vertical-rl", transform: "rotate(180deg)" }}
+          >
+            Hand {hand.length > 0 ? `(${hand.length})` : ""}
+          </span>
+        </button>
+      )}
     </div>
   );
 }

@@ -5,7 +5,8 @@ import type { GameView } from "@/lib/game/types";
 import { Button } from "@/components/ui/button";
 import { MapView } from "./MapView";
 import { HoverHand } from "./HoverHand";
-import { MarketPanel } from "./MarketPanel";
+import { LootSection, EssentialsSection, ToolsSection } from "./MarketPanel";
+import { GameCardTile } from "./GameCardTile";
 import { PlayerStatusBar } from "./PlayerStatusBar";
 import { TurnRecap } from "./TurnRecap";
 import { ActionLog } from "./ActionLog";
@@ -28,6 +29,7 @@ export function GameBoard({ gameId, state, playerId, onPlayerSelect, onUpdate }:
   const me = state.players.find((p) => p.id === playerId);
   const isMyTurn = state.currentTurnPlayerId === playerId;
   const currentTurnPlayer = state.players.find((p) => p.id === state.currentTurnPlayerId);
+  const myRoom = state.map.rooms.find((r) => r.id === me?.currentRoomId);
 
   async function callApi(path: string, body: Record<string, unknown>) {
     setError(null);
@@ -66,48 +68,38 @@ export function GameBoard({ gameId, state, playerId, onPlayerSelect, onUpdate }:
   }
 
   if (state.status === "finished") {
-    const sortedPlayers = state.players
-      .map((p) => ({
-        ...p,
-        rep: p.artifacts.reduce((s, a) => s + a.reputationPoints, 0) + p.achievements.reduce((s, a) => s + a.reputationPoints, 0),
-      }))
+    const sorted = state.players
+      .map((p) => ({ ...p, rep: p.artifacts.reduce((s, a) => s + a.reputationPoints, 0) + p.achievements.reduce((s, a) => s + a.reputationPoints, 0) }))
       .sort((a, b) => b.rep - a.rep);
-
     return (
       <div className="min-h-screen flex items-center justify-center p-8">
         <div className="max-w-2xl w-full bg-stone-800 border border-stone-600 rounded-xl p-8 text-center space-y-4 shadow-2xl">
           <h1 className="font-display text-4xl text-amber-300">The Dungeon Falls Silent</h1>
-          <div className="mt-6 text-left">
-            <h3 className="font-display text-sm text-amber-400 tracking-widest uppercase mb-3">Final Standings</h3>
-            <ul className="space-y-2">
-              {sortedPlayers.map((p, i) => (
-                <li key={p.id} className="flex justify-between border-b border-stone-700 py-2">
-                  <span className="text-stone-200">
-                    {i === 0 && "👑 "}{p.name}{p.isDead ? " 💀" : ""}
-                  </span>
-                  <span className="text-amber-400 font-semibold">
-                    {p.isDead ? "0 reputation" : `${p.rep} reputation`}
-                  </span>
-                </li>
-              ))}
-            </ul>
-          </div>
+          <ul className="mt-6 text-left space-y-2">
+            {sorted.map((p, i) => (
+              <li key={p.id} className="flex justify-between border-b border-stone-700 py-2">
+                <span className="text-stone-200">{i === 0 && "👑 "}{p.name}{p.isDead ? " 💀" : ""}</span>
+                <span className="text-amber-400 font-semibold">{p.isDead ? "0 rep" : `${p.rep} rep`}</span>
+              </li>
+            ))}
+          </ul>
         </div>
       </div>
     );
   }
 
-  return (
-    <div className="min-h-screen bg-stone-950">
-      {/* Sticky hand — fixed left edge */}
-      <HoverHand
-        hand={state.myHand ?? []}
-        isMyTurn={isMyTurn}
-        onPlay={(gameCardId) => callApi("/play-card", { playerId, gameCardId })}
-      />
+  const cardProps = {
+    isMyTurn,
+    myGold: me.gold,
+    myFocus: isMyTurn ? (state.myStats?.focusRemaining ?? 0) : 0,
+    onBuyCard: (p: { gameCardId?: string; cardDefinitionId?: string }) => callApi("/buy-card", { playerId, ...p }),
+    onResolveThreat: (card: MarketCardView) => setThreatTarget({ gameCardId: card.gameCardId, name: card.name, options: card.resolutionOptions }),
+  };
 
-      <div className="max-w-[1400px] mx-auto px-4 py-3 space-y-3">
-        {/* Player status */}
+  return (
+    <div className="min-h-screen bg-stone-950 flex flex-col">
+      {/* Full-width top bar */}
+      <div className="px-4 pt-3 space-y-3">
         <PlayerStatusBar
           players={state.players}
           currentTurnPlayerId={state.currentTurnPlayerId}
@@ -116,7 +108,6 @@ export function GameBoard({ gameId, state, playerId, onPlayerSelect, onUpdate }:
           myStats={isMyTurn ? state.myStats : null}
         />
 
-        {/* Turn banner */}
         {isMyTurn ? (
           <div className="flex items-center justify-between bg-amber-900/60 border border-amber-700 rounded-lg px-5 py-3">
             <span className="font-display text-amber-200 tracking-wide">⚡ Your Turn</span>
@@ -130,59 +121,84 @@ export function GameBoard({ gameId, state, playerId, onPlayerSelect, onUpdate }:
           </div>
         )}
 
-        {/* Last turn recap (collapsed by default) */}
-        <TurnRecap
-          log={state.actionLog}
-          currentTurnNumber={state.turnNumber}
-          currentTurnPlayerId={state.currentTurnPlayerId}
-        />
+        <TurnRecap log={state.actionLog} currentTurnNumber={state.turnNumber} currentTurnPlayerId={state.currentTurnPlayerId} />
 
         {error && (
-          <div className="bg-red-900/50 border border-red-700 text-red-200 rounded-lg px-4 py-2 text-sm">
-            {error}
-          </div>
+          <div className="bg-red-900/50 border border-red-700 text-red-200 rounded-lg px-4 py-2 text-sm">{error}</div>
         )}
+      </div>
 
-        {/* Map — full width */}
-        <MapView
-          map={state.map}
-          players={state.players}
-          currentPlayerId={playerId}
+      {/* 4/5-column content area */}
+      <div className="flex gap-3 px-4 pb-4 pt-3 flex-1 min-h-0 overflow-hidden">
+        {/* Col 1: Hand (collapses to tab) */}
+        <HoverHand
+          hand={state.myHand ?? []}
           isMyTurn={isMyTurn}
-          movementRemaining={isMyTurn ? (state.myStats?.movementRemaining ?? 0) : 0}
-          myTools={me.tools}
-          onMove={(targetRoomId) => callApi("/move", { playerId, targetRoomId })}
-          onPickupArtifact={(gameArtifactId) => callApi("/pickup-artifact", { playerId, gameArtifactId })}
-          onEscape={() => callApi("/escape", { playerId })}
+          onPlay={(gameCardId) => callApi("/play-card", { playerId, gameCardId })}
         />
 
-        {/* Market */}
-        <MarketPanel
-          cardOffers={state.dynamicMarket}
-          standardCards={state.staticMarket}
-          isMyTurn={isMyTurn}
-          myGold={me.gold}
-          myFocus={isMyTurn ? (state.myStats?.focusRemaining ?? 0) : 0}
-          myRoomIsMarket={state.map.rooms.find((r) => r.id === me.currentRoomId)?.isMarket ?? false}
-          myTools={me.tools}
-          onBuyCard={(p) => callApi("/buy-card", { playerId, ...p })}
-          onBuyTool={(toolCode) => callApi("/buy-tool", { playerId, toolCode })}
-          onResolveThreat={(card) => setThreatTarget({ gameCardId: card.gameCardId, name: card.name, options: card.resolutionOptions })}
-        />
+        {/* Col 2: Map */}
+        <div className="flex-1 min-w-0">
+          <MapView
+            map={state.map}
+            players={state.players}
+            currentPlayerId={playerId}
+            isMyTurn={isMyTurn}
+            movementRemaining={isMyTurn ? (state.myStats?.movementRemaining ?? 0) : 0}
+            myTools={me.tools}
+            onMove={(targetRoomId) => callApi("/move", { playerId, targetRoomId })}
+            onPickupArtifact={(gameArtifactId) => callApi("/pickup-artifact", { playerId, gameArtifactId })}
+            onEscape={() => callApi("/escape", { playerId })}
+          />
+          {/* Debug log below map */}
+          <div className="mt-2">
+            <button onClick={() => setShowLog(!showLog)} className="text-xs text-stone-500 hover:text-stone-300 transition-colors">
+              {showLog ? "▲ Hide" : "▼ Show"} action log
+            </button>
+            {showLog && <div className="mt-2"><ActionLog log={state.actionLog} players={state.players} /></div>}
+          </div>
+        </div>
 
-        {/* Debug: action log toggle */}
-        <div>
-          <button
-            onClick={() => setShowLog(!showLog)}
-            className="text-xs text-stone-400 hover:text-stone-400 transition-colors"
-          >
-            {showLog ? "▲ Hide" : "▼ Show"} action log
-          </button>
-          {showLog && (
-            <div className="mt-2">
-              <ActionLog log={state.actionLog} players={state.players} />
+        {/* Col 3: Loot + Essentials — same height as siblings, scrollable */}
+        <div className="w-56 shrink-0 self-stretch flex flex-col bg-stone-900 border border-stone-700 rounded-lg overflow-hidden">
+          <div className="overflow-y-auto flex-1 min-h-0">
+            {/* Loot */}
+            <div className="px-4 pt-3 pb-1 sticky top-0 bg-stone-900 z-10 border-b border-stone-800">
+              <span className="font-display text-sm font-semibold tracking-wide text-amber-200">Loot</span>
             </div>
-          )}
+            <div className="px-4 py-3 flex flex-col gap-2">
+              {state.dynamicMarket.length === 0
+                ? <p className="text-xs text-stone-400 italic">Empty</p>
+                : state.dynamicMarket.map((card) =>
+                    card.isKillableThreat ? (
+                      <GameCardTile key={card.gameCardId} card={card} action={{ label: "Resolve", variant: "destructive", disabled: !isMyTurn, onClick: () => cardProps.onResolveThreat(card) }} />
+                    ) : (
+                      <GameCardTile key={card.gameCardId} card={card} action={{ label: card.isOneTimeUse ? "Use" : "Buy", variant: "outline", disabled: !isMyTurn || cardProps.myFocus < card.costFocus || cardProps.myGold < card.costGold, onClick: () => cardProps.onBuyCard({ gameCardId: card.gameCardId }) }} />
+                    )
+                  )
+              }
+            </div>
+            {/* Essentials */}
+            <div className="px-4 pt-2 pb-1 sticky top-[37px] bg-stone-900 z-10 border-t border-b border-stone-800">
+              <span className="font-display text-sm font-semibold tracking-wide text-amber-200">Essentials</span>
+            </div>
+            <div className="px-4 py-3 flex flex-col gap-2">
+              {state.staticMarket.map((card) => (
+                <GameCardTile key={card.cardDefinitionId} card={{ ...card, available: card.available }} action={{ label: "Buy", variant: "outline", disabled: !isMyTurn || cardProps.myFocus < card.costFocus || cardProps.myGold < card.costGold || card.available === 0, onClick: () => cardProps.onBuyCard({ cardDefinitionId: card.cardDefinitionId }) }} />
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Col 4: Market (tools) */}
+        <div className="w-56 shrink-0">
+          <ToolsSection
+            isMyTurn={isMyTurn}
+            myGold={me.gold}
+            myRoomIsMarket={myRoom?.isMarket ?? false}
+            myTools={me.tools}
+            onBuyTool={(toolCode) => callApi("/buy-tool", { playerId, toolCode })}
+          />
         </div>
       </div>
 
