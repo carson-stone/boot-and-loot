@@ -20,8 +20,8 @@ export function MapView({ map, players, currentPlayerId, isMyTurn, onMove, onPic
   const myRoomId = me?.currentRoomId;
 
   // Cell dimensions
-  const cellSize = 110;
-  const padding = 20;
+  const cellSize = 150;
+  const padding = 24;
 
   const maxX = Math.max(...map.rooms.map((r) => r.positionX ?? 0));
   const maxY = Math.max(...map.rooms.map((r) => r.positionY ?? 0));
@@ -107,19 +107,19 @@ export function MapView({ map, players, currentPlayerId, isMyTurn, onMove, onPic
                   }}
                 >
                   <rect
-                    x={c.x - 52}
-                    y={c.y - 32}
-                    width={104}
-                    height={70}
+                    x={c.x - 64}
+                    y={c.y - 38}
+                    width={128}
+                    height={84}
                     fill={fill}
                     stroke={isReachable && isMyTurn ? "#0ea5e9" : "#cbd5e1"}
-                    strokeWidth={isReachable && isMyTurn ? 2 : 1}
-                    rx={6}
+                    strokeWidth={isReachable && isMyTurn ? 2.5 : 1}
+                    rx={8}
                   />
-                  <text x={c.x} y={c.y - 16} textAnchor="middle" fontSize="9" fontWeight="600" fill="#1e293b">
+                  <text x={c.x} y={c.y - 20} textAnchor="middle" fontSize="11" fontWeight="700" fill="#1e293b">
                     {room.name}
                   </text>
-                  <text x={c.x} y={c.y - 4} textAnchor="middle" fontSize="8" fill="#475569">
+                  <text x={c.x} y={c.y - 6} textAnchor="middle" fontSize="11" fill="#475569">
                     {room.isMarket && "🏪"}
                     {room.hasArtifactSlot && room.artifact && "💎"}
                     {room.monsterCount > 0 && `👹${room.monsterCount}`}
@@ -128,20 +128,19 @@ export function MapView({ map, players, currentPlayerId, isMyTurn, onMove, onPic
                   {/* Player tokens — colored circles with initial, spread horizontally */}
                   {playersHere.map((p, idx) => {
                     const total = playersHere.length;
-                    const spread = (total - 1) * 13;
+                    const spread = (total - 1) * 26;
                     const tx = c.x - spread / 2 + idx * 26;
-                    const ty = c.y + 18;
+                    const ty = c.y + 24;
                     const isMe = p.id === currentPlayerId;
                     return (
                       <g key={p.id}>
-                        {/* outer ring for current player */}
-                        {isMe && <circle cx={tx} cy={ty} r={13} fill="white" stroke={playerColor(p)} strokeWidth={2} />}
-                        <circle cx={tx} cy={ty} r={10} fill={playerColor(p)} />
+                        {isMe && <circle cx={tx} cy={ty} r={15} fill="white" stroke={playerColor(p)} strokeWidth={2.5} />}
+                        <circle cx={tx} cy={ty} r={11} fill={playerColor(p)} />
                         <text
                           x={tx}
                           y={ty + 4}
                           textAnchor="middle"
-                          fontSize="10"
+                          fontSize="11"
                           fontWeight="700"
                           fill="white"
                         >
