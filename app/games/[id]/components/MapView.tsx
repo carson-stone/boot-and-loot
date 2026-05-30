@@ -162,6 +162,20 @@ export function MapView({ map, players, currentPlayerId, isMyTurn, onMove, onPic
           </svg>
         </div>
 
+        {/* Legend */}
+        <div className="border-t border-slate-200 pt-2 mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-700">
+          <span className="font-semibold text-slate-900">Legend:</span>
+          <span><span className="inline-block w-3 h-3 rounded-sm bg-amber-100 border border-amber-300 mr-1 align-middle" />Your room</span>
+          <span><span className="inline-block w-3 h-3 rounded-sm bg-emerald-100 border border-emerald-300 mr-1 align-middle" />Entrance / Exit</span>
+          <span><span className="inline-block w-3 h-3 rounded-sm bg-blue-100 border border-blue-300 mr-1 align-middle" />Market room</span>
+          <span><span className="inline-block w-3 h-3 rounded-sm bg-pink-100 border border-pink-300 mr-1 align-middle" />Has artifact</span>
+          <span><span className="inline-block w-3 h-3 rounded-sm border-2 border-sky-400 mr-1 align-middle" />Reachable</span>
+          <span>💎 Artifact present</span>
+          <span>👹 Monsters</span>
+          <span>🔑 Requires key</span>
+          <span>▶ One-way passage</span>
+        </div>
+
         {/* Current room actions */}
         {myRoom && (
           <div className="border-t border-slate-200 pt-3 mt-3 flex items-center justify-between gap-2 flex-wrap">
