@@ -62,13 +62,23 @@ export function MapView({ map, players, currentPlayerId, isMyTurn, movementRemai
       <CardContent className="p-2">
         <div className="overflow-auto" style={{ maxHeight: "60vh" }}>
           <svg width={svgWidth} height={svgHeight} className="block">
-            {/* Connections */}
-            {map.connections.map((conn, i) => {
+            {/* Connections — deduplicate bidirectional pairs: only draw once per room pair */}
+            {map.connections
+              .filter((conn) => {
+                // For bidirectional pairs, only keep the one where fromRoomId < toRoomId
+                // (arbitrary but stable tiebreak so exactly one direction is drawn)
+                const hasReverse = map.connections.some(
+                  (c2) => c2.fromRoomId === conn.toRoomId && c2.toRoomId === conn.fromRoomId,
+                );
+                return !hasReverse || conn.fromRoomId < conn.toRoomId;
+              })
+              .map((conn, i) => {
               const from = map.rooms.find((r) => r.id === conn.fromRoomId);
               const to = map.rooms.find((r) => r.id === conn.toRoomId);
               if (!from || !to) return null;
               const fc = roomCenter(from);
               const tc = roomCenter(to);
+              // One-way = no reverse connection exists at all
               const isOneWay = !map.connections.some(
                 (c2) => c2.fromRoomId === conn.toRoomId && c2.toRoomId === conn.fromRoomId,
               );
