@@ -40,6 +40,25 @@ export function MapView({ map, players, currentPlayerId, isMyTurn, movementRemai
     };
   }
 
+  // Room rect: x ± 64, y -38 to +46 (matches the <rect> dimensions)
+  const ROOM_HW = 64; // half-width
+  const ROOM_HT = 38; // half-height top
+  const ROOM_HB = 46; // half-height bottom
+
+  // Returns the point where a line from `center` toward `other` exits the room rectangle.
+  function roomEdge(center: {x: number; y: number}, other: {x: number; y: number}) {
+    const dx = other.x - center.x;
+    const dy = other.y - center.y;
+    if (dx === 0 && dy === 0) return center;
+    const ts: number[] = [];
+    if (dx > 0) ts.push(ROOM_HW / dx);
+    else if (dx < 0) ts.push(-ROOM_HW / dx);
+    if (dy > 0) ts.push(ROOM_HB / dy);
+    else if (dy < 0) ts.push(ROOM_HT / (-dy));
+    const t = Math.min(...ts);
+    return { x: center.x + t * dx, y: center.y + t * dy };
+  }
+
   const myRoom = map.rooms.find((r) => r.id === myRoomId);
   const reachableRoomIds = new Set(
     map.connections
@@ -78,19 +97,22 @@ export function MapView({ map, players, currentPlayerId, isMyTurn, movementRemai
               if (!from || !to) return null;
               const fc = roomCenter(from);
               const tc = roomCenter(to);
+              // Clip line to room edges so it doesn't visually pass through rooms
+              const p1 = roomEdge(fc, tc);
+              const p2 = roomEdge(tc, fc);
               // One-way = no reverse connection exists at all
               const isOneWay = !map.connections.some(
                 (c2) => c2.fromRoomId === conn.toRoomId && c2.toRoomId === conn.fromRoomId,
               );
-              const mx = (fc.x + tc.x) / 2;
-              const my = (fc.y + tc.y) / 2;
+              const mx = (p1.x + p2.x) / 2;
+              const my = (p1.y + p2.y) / 2;
               return (
                 <g key={i}>
                   <line
-                    x1={fc.x}
-                    y1={fc.y}
-                    x2={tc.x}
-                    y2={tc.y}
+                    x1={p1.x}
+                    y1={p1.y}
+                    x2={p2.x}
+                    y2={p2.y}
                     stroke={conn.requiresTool ? "#dc2626" : "#94a3b8"}
                     strokeWidth={conn.requiresTool ? 2 : 1}
                     strokeDasharray={conn.requiresTool ? "6,3" : undefined}

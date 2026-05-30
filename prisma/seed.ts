@@ -329,7 +329,6 @@ async function main() {
     { from: "Cursed Throne", to: "Throne Antechamber", bidirectional: true, cost: 1, requiresTool: null, description: null },
     { from: "Cursed Throne", to: "Drowned Crypt", bidirectional: false, cost: 1, requiresTool: null, description: "Crumbling ledge — one-way drop" },
     { from: "Drowned Crypt", to: "Throne Antechamber", bidirectional: true, cost: 1, requiresTool: null, description: null },
-    { from: "Antechamber", to: "Burial Chamber", bidirectional: false, cost: 1, requiresTool: null, description: "Collapsed shaft — one-way drop" },
     { from: "Venom Vault", to: "Throne Antechamber", bidirectional: true, cost: 1, requiresTool: null, description: null },
   ];
 
