@@ -112,15 +112,38 @@ export function GameBoard({ gameId, state, playerId, onPlayerSelect, onUpdate }:
           myStats={isMyTurn ? state.myStats : null}
         />
 
+        {/* Turn banner */}
+        {isMyTurn ? (
+          <div className="flex items-center justify-between bg-green-600 text-white rounded-lg px-5 py-3">
+            <div className="flex items-center gap-3">
+              <span className="text-lg font-bold">⚡ Your turn!</span>
+              {me && (
+                <span className="text-green-100 text-sm">
+                  {(state.myStats?.movementRemaining ?? 0) > 0 && `👟 ${state.myStats!.movementRemaining} `}
+                  {(state.myStats?.attacksRemaining ?? 0) > 0 && `⚔️ ${state.myStats!.attacksRemaining} `}
+                  💰 {me.gold}
+                </span>
+              )}
+            </div>
+            <Button
+              onClick={() => callApi("/end-turn", { playerId })}
+              variant="outline"
+              className="border-white text-black hover:bg-green-700 hover:text-white font-semibold"
+            >
+              End Turn →
+            </Button>
+          </div>
+        ) : (
+          currentTurnPlayer && (
+            <div className="bg-slate-200 text-slate-700 rounded-lg px-5 py-3 text-sm text-center">
+              Waiting for <strong>{currentTurnPlayer.name}</strong>…
+            </div>
+          )
+        )}
+
         {error && (
           <div className="bg-red-50 border border-red-200 text-red-900 rounded-md px-4 py-2 text-sm">
             {error}
-          </div>
-        )}
-
-        {!isMyTurn && currentTurnPlayer && (
-          <div className="bg-amber-50 border border-amber-200 text-amber-900 rounded-md px-4 py-2 text-sm text-center">
-            Waiting for <strong>{currentTurnPlayer.name}</strong>...
           </div>
         )}
 
@@ -129,7 +152,7 @@ export function GameBoard({ gameId, state, playerId, onPlayerSelect, onUpdate }:
           <div className="col-span-3">
             <ActionLog log={state.actionLog} players={state.players} />
           </div>
-          <div className="col-span-9 space-y-3">
+          <div className="col-span-9">
             <MapView
               map={state.map}
               players={state.players}
@@ -139,11 +162,6 @@ export function GameBoard({ gameId, state, playerId, onPlayerSelect, onUpdate }:
               onPickupArtifact={(gameArtifactId) => callApi("/pickup-artifact", { playerId, gameArtifactId })}
               onEscape={() => callApi("/escape", { playerId })}
             />
-            {isMyTurn && (
-              <Button onClick={() => callApi("/end-turn", { playerId })} variant="default">
-                End Turn
-              </Button>
-            )}
           </div>
         </div>
 
