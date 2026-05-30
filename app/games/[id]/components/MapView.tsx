@@ -61,8 +61,8 @@ export function MapView({ map, players, currentPlayerId, isMyTurn, movementRemai
   return (
     <Card>
       <CardContent className="p-2">
-        <div className="overflow-auto" style={{ maxHeight: "60vh" }}>
-          <svg width={svgWidth} height={svgHeight} className="block">
+        <div className="overflow-auto" style={{ maxHeight: "62vh" }}>
+          <svg width={svgWidth} height={svgHeight} className="block" style={{ background: "#141210" }}>
             {/* Connections — deduplicate bidirectional pairs: only draw once per room pair */}
             {map.connections
               .filter((conn) => {
@@ -92,13 +92,13 @@ export function MapView({ map, players, currentPlayerId, isMyTurn, movementRemai
                     y1={fc.y}
                     x2={tc.x}
                     y2={tc.y}
-                    stroke={conn.requiresTool ? "#dc2626" : "#94a3b8"}
-                    strokeWidth={conn.requiresTool ? 2 : 1}
+                    stroke={conn.requiresTool ? "#dc2626" : "#57534e"}
+                    strokeWidth={conn.requiresTool ? 2 : 1.5}
                   />
                   {isOneWay && (
                     <polygon
                       points={`${mx - 6},${my - 6} ${mx + 6},${my} ${mx - 6},${my + 6}`}
-                      fill="#94a3b8"
+                      fill="#57534e"
                       transform={`rotate(${Math.atan2(tc.y - fc.y, tc.x - fc.x) * (180 / Math.PI)}, ${mx}, ${my})`}
                     />
                   )}
@@ -135,11 +135,11 @@ export function MapView({ map, players, currentPlayerId, isMyTurn, movementRemai
                 (p) => p.currentRoomId === room.id && !p.hasExited && !p.isDead,
               );
 
-              let fill = "#f1f5f9";
-              if (isMyRoom) fill = "#fef3c7";
-              else if (room.isEntrance) fill = "#d1fae5";
-              else if (room.isMarket) fill = "#dbeafe";
-              else if (room.hasArtifactSlot && room.artifact) fill = "#fce7f3";
+              let fill = "#2a2520";
+              if (isMyRoom) fill = "#3d2a10";
+              else if (room.isEntrance) fill = "#1e2e1e";
+              else if (room.isMarket) fill = "#1e1e2e";
+              else if (room.hasArtifactSlot && room.artifact) fill = "#2e1e2e";
 
               return (
                 <g
@@ -155,14 +155,14 @@ export function MapView({ map, players, currentPlayerId, isMyTurn, movementRemai
                     width={128}
                     height={92}
                     fill={fill}
-                    stroke={isReachable && isMyTurn ? "#0ea5e9" : "#cbd5e1"}
+                    stroke={isReachable && isMyTurn ? "#c9a84c" : "#57534e"}
                     strokeWidth={isReachable && isMyTurn ? 2.5 : 1}
                     rx={8}
                   />
-                  <text x={c.x} y={c.y - 20} textAnchor="middle" fontSize="13" fontWeight="700" fill="#1e293b">
+                  <text x={c.x} y={c.y - 20} textAnchor="middle" fontSize="13" fontWeight="700" fill="#e8d5b0">
                     {room.name}
                   </text>
-                  <text x={c.x} y={c.y - 4} textAnchor="middle" fontSize="14" fill="#475569">
+                  <text x={c.x} y={c.y - 4} textAnchor="middle" fontSize="14" fill="#a8956e">
                     {room.isMarket && "🏪"}
                     {room.hasArtifactSlot && room.artifact && (
                       <>{"💎"}</>
@@ -216,17 +216,17 @@ export function MapView({ map, players, currentPlayerId, isMyTurn, movementRemai
         </div>
 
         {/* Legend */}
-        <div className="border-t border-slate-200 pt-2 mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-700">
-          <span className="font-semibold text-slate-900">Rooms:</span>
-          <span><span className="inline-block w-3 h-3 rounded-sm bg-amber-100 border border-amber-300 mr-1 align-middle" />Your room</span>
-          <span><span className="inline-block w-3 h-3 rounded-sm bg-emerald-100 border border-emerald-300 mr-1 align-middle" />Entrance / Exit</span>
-          <span><span className="inline-block w-3 h-3 rounded-sm bg-blue-100 border border-blue-300 mr-1 align-middle" />Market</span>
-          <span><span className="inline-block w-3 h-3 rounded-sm bg-pink-100 border border-pink-300 mr-1 align-middle" />Artifact</span>
-          <span><span className="inline-block w-3 h-3 rounded-sm border-2 border-sky-400 mr-1 align-middle" />Reachable</span>
-          <span>💎 Artifact present &nbsp; 👹 Monsters</span>
-          <span className="font-semibold text-slate-900">Tunnels:</span>
+        <div className="border-t border-stone-700 pt-2 mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-stone-500">
+          <span className="font-display text-stone-400 tracking-wide">Rooms:</span>
+          <span><span className="inline-block w-3 h-3 rounded-sm mr-1 align-middle" style={{background:"#3d2a10"}} />Your room</span>
+          <span><span className="inline-block w-3 h-3 rounded-sm mr-1 align-middle" style={{background:"#1e2e1e"}} />Entrance</span>
+          <span><span className="inline-block w-3 h-3 rounded-sm mr-1 align-middle" style={{background:"#1e1e2e"}} />Market</span>
+          <span><span className="inline-block w-3 h-3 rounded-sm mr-1 align-middle" style={{background:"#2e1e2e"}} />Artifact</span>
+          <span><span className="inline-block w-3 h-3 rounded-sm border-2 mr-1 align-middle" style={{borderColor:"#c9a84c"}} />Reachable</span>
+          <span>💎 Artifact &nbsp; 👹 Monsters</span>
+          <span className="font-display text-stone-400 tracking-wide">Tunnels:</span>
           <span className="flex items-center gap-1">
-            <svg width="28" height="8"><line x1="0" y1="4" x2="28" y2="4" stroke="#94a3b8" strokeWidth="1.5" /></svg>
+            <svg width="28" height="8"><line x1="0" y1="4" x2="28" y2="4" stroke="#57534e" strokeWidth="1.5" /></svg>
             Normal
           </span>
           <span className="flex items-center gap-1">
@@ -235,16 +235,17 @@ export function MapView({ map, players, currentPlayerId, isMyTurn, movementRemai
           </span>
           <span className="flex items-center gap-1">
             <svg width="28" height="8">
-              <line x1="0" y1="4" x2="22" y2="4" stroke="#94a3b8" strokeWidth="1.5" />
-              <polygon points="16,1 22,4 16,7" fill="#94a3b8" />
+              <line x1="0" y1="4" x2="22" y2="4" stroke="#57534e" strokeWidth="1.5" />
+              <polygon points="16,1 22,4 16,7" fill="#57534e" />
             </svg>
             One-way
           </span>
           <span className="flex items-center gap-1">
-            <span className="inline-flex items-center justify-center w-4 h-4 rounded-full bg-slate-900 text-white text-[9px] font-bold">2</span>
+            <span className="inline-flex items-center justify-center w-4 h-4 rounded-full bg-stone-700 text-stone-200 text-[9px] font-bold">2</span>
             Costs 2 movement
           </span>
         </div>
+
 
         {/* Current room actions */}
         {myRoom && (

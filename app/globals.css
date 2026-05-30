@@ -1,19 +1,36 @@
 @import "tailwindcss";
 
+/* ── Fantasy palette ──────────────────────────────────────── */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --stone:        #1c1917;   /* darkest background */
+  --stone-mid:    #292524;   /* panel backgrounds  */
+  --stone-light:  #44403c;   /* borders, subtle dividers */
+  --parchment:    #f5e6c8;   /* card faces, primary light surface */
+  --parchment-dk: #d9c49a;   /* card borders, secondary parchment */
+  --gold:         #c9a84c;   /* accents, highlights */
+  --gold-light:   #f0d080;   /* hovered gold elements */
+  --crimson:      #8b1a1a;   /* danger, threats */
+  --crimson-light:#b22222;
+  --ink:          #1c1410;   /* text on parchment */
+  --mist:         #c2b89a;   /* muted text on parchment */
+  --ghost:        #8a7e6e;   /* very muted text on parchment */
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
+/* ── Base ─────────────────────────────────────────────────── */
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--stone);
+  color: #e8d5b0;
+  font-family: system-ui, -apple-system, sans-serif;
 }
+
+/* ── Cinzel for display headings ──────────────────────────── */
+.font-display, h1, h2 {
+  font-family: var(--font-cinzel), Georgia, serif;
+  letter-spacing: 0.04em;
+}
+
+/* ── Scrollbar styling ────────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--stone-mid); }
+::-webkit-scrollbar-thumb { background: var(--stone-light); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--gold); }

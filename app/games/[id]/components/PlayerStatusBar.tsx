@@ -1,9 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import type { PlayerSummary, MyTurnStats } from "@/lib/game/types";
-import { Badge } from "@/components/ui/badge";
+import type { PlayerSummary, MyTurnStats, HandCardView } from "@/lib/game/types";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Badge } from "@/components/ui/badge";
 import { GameCardTile } from "./GameCardTile";
 
 interface Props {
@@ -22,10 +22,10 @@ export function PlayerStatusBar({ players, currentTurnPlayerId, turnNumber, myPl
 
   return (
     <>
-      <div className="bg-white rounded-lg border border-slate-200 p-3">
+      <div className="bg-stone-900 border border-stone-700 rounded-lg p-3">
         <div className="flex items-center justify-between mb-2">
-          <h2 className="text-sm font-semibold text-slate-900">Players</h2>
-          {turnNumber && <Badge variant="secondary">Turn {turnNumber}</Badge>}
+          <h2 className="font-display text-xs text-amber-400 tracking-widest uppercase">Adventurers</h2>
+          {turnNumber && <span className="text-xs text-stone-500 font-display tracking-wide">Turn {turnNumber}</span>}
         </div>
 
         <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
@@ -36,70 +36,66 @@ export function PlayerStatusBar({ players, currentTurnPlayerId, turnNumber, myPl
             return (
               <button
                 key={p.id}
-                className={`p-2 rounded border text-left w-full transition-colors hover:brightness-95 ${
-                  isActive ? "border-amber-400 bg-amber-50" : "border-slate-200 bg-slate-50"
-                } ${p.isDead ? "opacity-50" : ""} ${p.hasExited ? "bg-green-50 border-green-300" : ""}`}
                 onClick={() => setInspecting(p)}
+                className={`p-2 rounded border text-left w-full transition-colors hover:border-amber-600 ${
+                  isActive ? "border-amber-600 bg-amber-950/40" : "border-stone-600 bg-stone-800"
+                } ${p.isDead ? "opacity-40" : ""} ${p.hasExited ? "border-green-700 bg-green-950/20" : ""}`}
               >
-                <div className="text-sm font-semibold text-slate-900 truncate flex items-center gap-1.5">
-                  <span className="inline-block w-3 h-3 rounded-full shrink-0" style={{ backgroundColor: color }} />
+                <div className="text-sm font-semibold text-stone-100 truncate flex items-center gap-1.5">
+                  <span className="inline-block w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: color }} />
                   {p.name}
-                  {isMe && <span className="text-[10px] text-slate-500 font-normal">(you)</span>}
+                  {isMe && <span className="text-[9px] text-stone-500 font-normal">(you)</span>}
                   {p.isDead && " 💀"}
                   {p.hasExited && " 🚪"}
                 </div>
                 <div className="flex gap-1 mt-1 flex-wrap">
-                  <Badge variant="destructive" className="text-xs">❤ {p.currentHealth}/{p.maxHealth}</Badge>
-                  <Badge variant="gold" className="text-xs">💰 {p.gold}</Badge>
-                  <Badge variant="attention" className="text-xs">👁 {p.attentionPoints}</Badge>
+                  <Badge variant="destructive" className="text-[10px]">❤ {p.currentHealth}/{p.maxHealth}</Badge>
+                  <Badge variant="gold" className="text-[10px]">💰 {p.gold}</Badge>
+                  <Badge variant="attention" className="text-[10px]">👁 {p.attentionPoints}</Badge>
                 </div>
-                <div className="text-xs text-slate-700 mt-1">
+                <div className="text-[10px] text-stone-500 mt-1">
                   Hand: {p.handCount} · Artifacts: {p.artifactCount}
+                  {p.achievements.length > 0 && ` · 🏆${p.achievements.length}`}
                 </div>
-                {p.achievements.length > 0 && (
-                  <div className="text-xs text-amber-700 mt-0.5">
-                    🏆 {p.achievements.length} achievement{p.achievements.length !== 1 ? "s" : ""}
-                  </div>
-                )}
               </button>
             );
           })}
         </div>
 
-        {/* Current player's turn stats */}
+        {/* Current player turn resources */}
         {myStats && (
-          <div className="mt-3 pt-3 border-t border-slate-200 flex flex-wrap gap-3 text-xs text-slate-700">
-            <span>🔵 <strong className="text-slate-900">{myStats.focusRemaining}</strong> focus</span>
-            <span>⚡ <strong className="text-slate-900">{myStats.movementRemaining}</strong> movement</span>
-            <span>⚔ <strong className="text-slate-900">{myStats.attacksRemaining}</strong> attacks</span>
-            <span>🂠 <strong className="text-slate-900">{myStats.deckCount}</strong> in deck</span>
+          <div className="mt-2 pt-2 border-t border-stone-700 flex flex-wrap gap-3 text-xs text-stone-400">
+            <span>🔵 <strong className="text-stone-200">{myStats.focusRemaining}</strong> focus</span>
+            <span>⚡ <strong className="text-stone-200">{myStats.movementRemaining}</strong> movement</span>
+            <span>⚔ <strong className="text-stone-200">{myStats.attacksRemaining}</strong> attacks</span>
+            <span>🂠 <strong className="text-stone-200">{myStats.deckCount}</strong> in deck</span>
             <button
-              className="underline text-slate-600 hover:text-slate-900"
+              className="text-stone-500 underline hover:text-stone-300"
               onClick={() => setDiscardOpen(true)}
             >
-              🗂 {myStats.discardPile.length} in discard
+              🗂 {myStats.discardPile.length} discarded
             </button>
           </div>
         )}
       </div>
 
-      {/* Player detail modal */}
+      {/* Player inspect modal */}
       {inspecting && (
         <Dialog open onOpenChange={(open) => !open && setInspecting(null)}>
-          <DialogContent className="max-w-md">
+          <DialogContent className="max-w-md bg-stone-900 border-stone-600">
             <DialogHeader>
-              <DialogTitle>{inspecting.name}</DialogTitle>
+              <DialogTitle className="font-display text-amber-300">{inspecting.name}</DialogTitle>
             </DialogHeader>
-            <div className="space-y-3 text-sm">
+            <div className="space-y-4 text-sm">
               <div className="flex gap-2 flex-wrap">
-                <Badge variant="destructive">❤ {inspecting.currentHealth}/{inspecting.maxHealth} HP</Badge>
+                <Badge variant="destructive">❤ {inspecting.currentHealth}/{inspecting.maxHealth}</Badge>
                 <Badge variant="gold">💰 {inspecting.gold} gold</Badge>
-                <Badge variant="attention">👁 {inspecting.attentionPoints} attention</Badge>
+                <Badge variant="attention">👁 {inspecting.attentionPoints}</Badge>
               </div>
 
               {inspecting.tools.length > 0 && (
                 <div>
-                  <div className="font-bold text-slate-900 mb-1">Tools</div>
+                  <div className="font-bold text-amber-400 text-xs uppercase tracking-wider mb-1.5">Tools</div>
                   <div className="flex gap-1 flex-wrap">
                     {inspecting.tools.map((t) => (
                       <Badge key={t} variant="secondary">{t.replace(/_/g, " ")}</Badge>
@@ -110,12 +106,12 @@ export function PlayerStatusBar({ players, currentTurnPlayerId, turnNumber, myPl
 
               {inspecting.artifacts.length > 0 && (
                 <div>
-                  <div className="font-bold text-slate-900 mb-1">Artifacts</div>
+                  <div className="font-bold text-amber-400 text-xs uppercase tracking-wider mb-1.5">Artifacts</div>
                   <ul className="space-y-1">
                     {inspecting.artifacts.map((a) => (
                       <li key={a.id} className="flex justify-between">
-                        <span>{a.name}</span>
-                        <Badge variant="secondary">+{a.reputationPoints} rep</Badge>
+                        <span className="text-stone-300">{a.name}</span>
+                        <Badge variant="gold">+{a.reputationPoints} rep</Badge>
                       </li>
                     ))}
                   </ul>
@@ -124,12 +120,12 @@ export function PlayerStatusBar({ players, currentTurnPlayerId, turnNumber, myPl
 
               {inspecting.achievements.length > 0 && (
                 <div>
-                  <div className="font-bold text-slate-900 mb-1">Achievements</div>
+                  <div className="font-bold text-amber-400 text-xs uppercase tracking-wider mb-1.5">Achievements</div>
                   <ul className="space-y-1">
                     {inspecting.achievements.map((a) => (
                       <li key={a.code} className="flex justify-between">
-                        <span>🏆 {a.name}</span>
-                        <Badge variant="secondary">+{a.reputationPoints} rep</Badge>
+                        <span className="text-stone-300">🏆 {a.name}</span>
+                        <Badge variant="gold">+{a.reputationPoints} rep</Badge>
                       </li>
                     ))}
                   </ul>
@@ -137,7 +133,7 @@ export function PlayerStatusBar({ players, currentTurnPlayerId, turnNumber, myPl
               )}
 
               {inspecting.tools.length === 0 && inspecting.artifacts.length === 0 && inspecting.achievements.length === 0 && (
-                <p className="text-slate-600">Nothing to show yet.</p>
+                <p className="text-stone-500 italic">Nothing to show yet.</p>
               )}
             </div>
           </DialogContent>
@@ -147,15 +143,15 @@ export function PlayerStatusBar({ players, currentTurnPlayerId, turnNumber, myPl
       {/* Discard pile modal */}
       {discardOpen && myStats && (
         <Dialog open onOpenChange={(open) => !open && setDiscardOpen(false)}>
-          <DialogContent className="max-w-4xl">
+          <DialogContent className="max-w-4xl bg-stone-900 border-stone-600">
             <DialogHeader>
-              <DialogTitle>Discard Pile ({myStats.discardPile.length})</DialogTitle>
+              <DialogTitle className="font-display text-amber-300">Discard Pile ({myStats.discardPile.length})</DialogTitle>
             </DialogHeader>
             {myStats.discardPile.length === 0 ? (
-              <p className="text-sm text-slate-600">Empty</p>
+              <p className="text-sm text-stone-500 italic">Empty</p>
             ) : (
               <div className="flex gap-3 overflow-x-auto pb-2">
-                {myStats.discardPile.map((card) => (
+                {myStats.discardPile.map((card: HandCardView) => (
                   <GameCardTile key={card.gameCardId} card={card} />
                 ))}
               </div>

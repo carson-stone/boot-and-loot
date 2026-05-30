@@ -3,13 +3,14 @@
 import { useState } from "react";
 import type { GameView } from "@/lib/game/types";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { MapView } from "./MapView";
-import { HandDisplay } from "./HandDisplay";
+import { HoverHand } from "./HoverHand";
 import { MarketPanel } from "./MarketPanel";
 import { PlayerStatusBar } from "./PlayerStatusBar";
+import { TurnRecap } from "./TurnRecap";
 import { ActionLog } from "./ActionLog";
 import { ThreatResolver } from "./ThreatResolver";
+import type { MarketCardView } from "@/lib/game/types";
 
 interface Props {
   gameId: string;
@@ -21,7 +22,8 @@ interface Props {
 
 export function GameBoard({ gameId, state, playerId, onPlayerSelect, onUpdate }: Props) {
   const [error, setError] = useState<string | null>(null);
-  const [threatTarget, setThreatTarget] = useState<{ gameCardId: string; name: string } | null>(null);
+  const [threatTarget, setThreatTarget] = useState<{ gameCardId: string; name: string; options: MarketCardView["resolutionOptions"] } | null>(null);
+  const [showLog, setShowLog] = useState(false);
 
   const me = state.players.find((p) => p.id === playerId);
   const isMyTurn = state.currentTurnPlayerId === playerId;
@@ -47,10 +49,10 @@ export function GameBoard({ gameId, state, playerId, onPlayerSelect, onUpdate }:
 
   if (!playerId || !me) {
     return (
-      <div className="min-h-screen bg-slate-50 p-8 flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center p-8">
         <div className="max-w-md text-center space-y-4">
-          <h2 className="text-xl font-semibold">Who are you?</h2>
-          <p className="text-slate-600 text-sm">Choose your player to view the game:</p>
+          <h2 className="font-display text-2xl text-amber-300">Who are you?</h2>
+          <p className="text-stone-400 text-sm">Choose your adventurer:</p>
           <div className="space-y-2">
             {state.players.map((p) => (
               <Button key={p.id} variant="outline" className="w-full" onClick={() => onPlayerSelect(p.id)}>
@@ -64,36 +66,30 @@ export function GameBoard({ gameId, state, playerId, onPlayerSelect, onUpdate }:
   }
 
   if (state.status === "finished") {
-    const winner = state.players.find((p) => p.hasExited && !p.isDead);
+    const sortedPlayers = state.players
+      .map((p) => ({
+        ...p,
+        rep: p.artifacts.reduce((s, a) => s + a.reputationPoints, 0) + p.achievements.reduce((s, a) => s + a.reputationPoints, 0),
+      }))
+      .sort((a, b) => b.rep - a.rep);
+
     return (
-      <div className="min-h-screen bg-slate-50 p-8 flex items-center justify-center">
-        <div className="max-w-2xl w-full bg-white rounded-lg border border-slate-200 p-8 text-center space-y-4">
-          <h1 className="text-3xl font-bold">Game Over</h1>
-          {winner ? (
-            <p className="text-lg">
-              <span className="font-semibold">{winner.name}</span> wins with {winner.currentHealth ?? 0} health remaining!
-            </p>
-          ) : (
-            <p className="text-lg">The dungeon claimed everyone. No winner.</p>
-          )}
-          <div className="text-left mt-6">
-            <h3 className="font-semibold mb-2">Final Standings:</h3>
-            <ul className="space-y-1">
-              {state.players
-                .map((p) => {
-                  const rep = p.artifacts.reduce((s, a) => s + a.reputationPoints, 0)
-                    + p.achievements.reduce((s, a) => s + a.reputationPoints, 0);
-                  return { ...p, rep };
-                })
-                .sort((a, b) => b.rep - a.rep)
-                .map((p) => (
-                  <li key={p.id} className="flex justify-between border-b border-slate-100 py-1">
-                    <span>{p.name}</span>
-                    <span className="text-slate-600">
-                      {p.isDead ? "💀 dead (0 rep)" : `${p.rep} reputation`}
-                    </span>
-                  </li>
-                ))}
+      <div className="min-h-screen flex items-center justify-center p-8">
+        <div className="max-w-2xl w-full bg-stone-800 border border-stone-600 rounded-xl p-8 text-center space-y-4 shadow-2xl">
+          <h1 className="font-display text-4xl text-amber-300">The Dungeon Falls Silent</h1>
+          <div className="mt-6 text-left">
+            <h3 className="font-display text-sm text-amber-400 tracking-widest uppercase mb-3">Final Standings</h3>
+            <ul className="space-y-2">
+              {sortedPlayers.map((p, i) => (
+                <li key={p.id} className="flex justify-between border-b border-stone-700 py-2">
+                  <span className="text-stone-200">
+                    {i === 0 && "👑 "}{p.name}{p.isDead ? " 💀" : ""}
+                  </span>
+                  <span className="text-amber-400 font-semibold">
+                    {p.isDead ? "0 reputation" : `${p.rep} reputation`}
+                  </span>
+                </li>
+              ))}
             </ul>
           </div>
         </div>
@@ -102,8 +98,16 @@ export function GameBoard({ gameId, state, playerId, onPlayerSelect, onUpdate }:
   }
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      <div className="max-w-[1400px] mx-auto p-4 space-y-4">
+    <div className="min-h-screen bg-stone-950">
+      {/* Sticky hand — fixed left edge */}
+      <HoverHand
+        hand={state.myHand ?? []}
+        isMyTurn={isMyTurn}
+        onPlay={(gameCardId) => callApi("/play-card", { playerId, gameCardId })}
+      />
+
+      <div className="max-w-[1400px] mx-auto px-4 py-3 space-y-3">
+        {/* Player status */}
         <PlayerStatusBar
           players={state.players}
           currentTurnPlayerId={state.currentTurnPlayerId}
@@ -114,51 +118,45 @@ export function GameBoard({ gameId, state, playerId, onPlayerSelect, onUpdate }:
 
         {/* Turn banner */}
         {isMyTurn ? (
-          <div className="flex items-center justify-between bg-green-600 text-white rounded-lg px-5 py-3">
-            <span className="text-lg font-bold">⚡ Your turn!</span>
-            <Button
-              onClick={() => callApi("/end-turn", { playerId })}
-              variant="outline"
-              className="border-white text-black hover:bg-green-700 hover:text-white font-semibold"
-            >
+          <div className="flex items-center justify-between bg-amber-900/60 border border-amber-700 rounded-lg px-5 py-3">
+            <span className="font-display text-amber-200 tracking-wide">⚡ Your Turn</span>
+            <Button onClick={() => callApi("/end-turn", { playerId })} variant="outline" className="border-amber-600 text-amber-200 hover:bg-amber-800">
               End Turn →
             </Button>
           </div>
-        ) : (
-          currentTurnPlayer && (
-            <div className="bg-slate-200 text-slate-700 rounded-lg px-5 py-3 text-sm text-center">
-              Waiting for <strong>{currentTurnPlayer.name}</strong>…
-            </div>
-          )
+        ) : currentTurnPlayer && (
+          <div className="bg-stone-800 border border-stone-600 rounded-lg px-5 py-3 text-center text-stone-400 text-sm">
+            Waiting for <span className="text-amber-300 font-semibold">{currentTurnPlayer.name}</span>…
+          </div>
         )}
 
+        {/* Last turn recap (collapsed by default) */}
+        <TurnRecap
+          log={state.actionLog}
+          currentTurnNumber={state.turnNumber}
+          currentTurnPlayerId={state.currentTurnPlayerId}
+        />
+
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-900 rounded-md px-4 py-2 text-sm">
+          <div className="bg-red-900/50 border border-red-700 text-red-200 rounded-lg px-4 py-2 text-sm">
             {error}
           </div>
         )}
 
-        {/* Map row: action log + map side by side */}
-        <div className="grid grid-cols-12 gap-4">
-          <div className="col-span-3">
-            <ActionLog log={state.actionLog} players={state.players} />
-          </div>
-          <div className="col-span-9">
-            <MapView
-              map={state.map}
-              players={state.players}
-              currentPlayerId={playerId}
-              isMyTurn={isMyTurn}
-              movementRemaining={isMyTurn ? (state.myStats?.movementRemaining ?? 0) : 0}
-              myTools={me.tools}
-              onMove={(targetRoomId) => callApi("/move", { playerId, targetRoomId })}
-              onPickupArtifact={(gameArtifactId) => callApi("/pickup-artifact", { playerId, gameArtifactId })}
-              onEscape={() => callApi("/escape", { playerId })}
-            />
-          </div>
-        </div>
+        {/* Map — full width */}
+        <MapView
+          map={state.map}
+          players={state.players}
+          currentPlayerId={playerId}
+          isMyTurn={isMyTurn}
+          movementRemaining={isMyTurn ? (state.myStats?.movementRemaining ?? 0) : 0}
+          myTools={me.tools}
+          onMove={(targetRoomId) => callApi("/move", { playerId, targetRoomId })}
+          onPickupArtifact={(gameArtifactId) => callApi("/pickup-artifact", { playerId, gameArtifactId })}
+          onEscape={() => callApi("/escape", { playerId })}
+        />
 
-        {/* Market row: full width, three sections side by side */}
+        {/* Market */}
         <MarketPanel
           cardOffers={state.dynamicMarket}
           standardCards={state.staticMarket}
@@ -169,29 +167,37 @@ export function GameBoard({ gameId, state, playerId, onPlayerSelect, onUpdate }:
           myTools={me.tools}
           onBuyCard={(p) => callApi("/buy-card", { playerId, ...p })}
           onBuyTool={(toolCode) => callApi("/buy-tool", { playerId, toolCode })}
-          onResolveThreat={(card) => setThreatTarget({ gameCardId: card.gameCardId, name: card.name })}
+          onResolveThreat={(card) => setThreatTarget({ gameCardId: card.gameCardId, name: card.name, options: card.resolutionOptions })}
         />
 
-        {/* Hand: full width */}
-        <HandDisplay
-          hand={state.myHand ?? []}
-          isMyTurn={isMyTurn}
-          onPlay={(gameCardId) => callApi("/play-card", { playerId, gameCardId })}
-        />
-
-        {threatTarget && (
-          <ThreatResolver
-            gameCardId={threatTarget.gameCardId}
-            threatName={threatTarget.name}
-            options={state.dynamicMarket.find((c) => c.gameCardId === threatTarget.gameCardId)?.resolutionOptions ?? []}
-            onResolve={async (resolutionOptionId) => {
-              await callApi("/resolve-threat", { playerId, gameCardId: threatTarget.gameCardId, resolutionOptionId });
-              setThreatTarget(null);
-            }}
-            onClose={() => setThreatTarget(null)}
-          />
-        )}
+        {/* Debug: action log toggle */}
+        <div>
+          <button
+            onClick={() => setShowLog(!showLog)}
+            className="text-xs text-stone-600 hover:text-stone-400 transition-colors"
+          >
+            {showLog ? "▲ Hide" : "▼ Show"} action log
+          </button>
+          {showLog && (
+            <div className="mt-2">
+              <ActionLog log={state.actionLog} players={state.players} />
+            </div>
+          )}
+        </div>
       </div>
+
+      {threatTarget && (
+        <ThreatResolver
+          gameCardId={threatTarget.gameCardId}
+          threatName={threatTarget.name}
+          options={threatTarget.options}
+          onResolve={async (resolutionOptionId) => {
+            await callApi("/resolve-threat", { playerId, gameCardId: threatTarget.gameCardId, resolutionOptionId });
+            setThreatTarget(null);
+          }}
+          onClose={() => setThreatTarget(null)}
+        />
+      )}
     </div>
   );
 }

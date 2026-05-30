@@ -42,7 +42,7 @@ export function MarketPanel({
         </CardHeader>
         <CardContent className="px-4 pb-4">
           {cardOffers.length === 0 ? (
-            <p className="text-xs text-slate-600">Empty</p>
+            <p className="text-xs text-stone-600 italic">Empty</p>
           ) : (
             <div className="flex gap-3 overflow-x-auto pb-1">
               {cardOffers.map((card) =>
