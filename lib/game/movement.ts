@@ -26,7 +26,8 @@ export async function movePlayer(
     if (!hasTool) throw new GameError(`Requires tool: ${connection.requiresTool}`, "MISSING_TOOL");
   }
 
-  const availableMovement = turnState.resources.movement - turnState.movementUsedThisTurn;
+  // resources.movement is already net (gained minus costs from action log) — use directly
+  const availableMovement = turnState.resources.movement;
   if (connection.movementCost > availableMovement) {
     throw new GameError(
       `Not enough movement: need ${connection.movementCost}, have ${availableMovement}`,

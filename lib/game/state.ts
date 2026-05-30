@@ -308,7 +308,7 @@ export async function loadGameState(gameId: string, requestingPlayerId?: string)
         include: { cardDefinition: { include: { effects: { orderBy: { displayOrder: "asc" } } } } },
       });
       myStats = {
-        movementRemaining: turnState.resources.movement - turnState.movementUsedThisTurn,
+        movementRemaining: turnState.resources.movement,
         attacksRemaining: turnState.resources.attacks - turnState.attacksUsedThisTurn,
         deckCount,
         discardPile: discardCards.map((c) => ({
