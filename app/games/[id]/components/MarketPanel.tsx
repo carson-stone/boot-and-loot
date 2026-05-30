@@ -87,7 +87,7 @@ export function ToolsSection({ isMyTurn, myGold, myRoomIsMarket, myTools, onBuyT
   const canBuy = isMyTurn && myRoomIsMarket;
 
   return (
-    <Card>
+    <Card className="h-full">
       <CardHeader className="pb-2 pt-3 px-4">
         <CardTitle>
           Market{" "}
