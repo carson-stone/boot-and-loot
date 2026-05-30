@@ -29,22 +29,22 @@ export function PlayerStatusBar({ players, currentTurnPlayerId, turnNumber, myPl
       <div className="bg-stone-900 border border-stone-700 rounded-lg p-3">
         <div className="flex items-center justify-between mb-2">
           <h2 className="font-display text-sm font-semibold tracking-wide text-amber-200">Adventurers</h2>
-          {turnNumber && <span className="text-xs text-stone-300 font-display tracking-wide">Turn {turnNumber}</span>}
+          <div className="flex items-center gap-2">
+            {turnNumber && <span className="text-xs text-stone-400 font-display tracking-wide">Turn {turnNumber}</span>}
+            {isMyTurn ? (
+              <div className="flex items-center gap-2 bg-amber-950/60 border border-amber-800 rounded px-2 py-1">
+                <span className="text-xs font-semibold text-amber-300">⚡ Your turn</span>
+                <Button size="sm" variant="outline" className="h-5 text-[11px] border-amber-700 text-amber-300 hover:bg-amber-900 py-0 px-1.5" onClick={onEndTurn}>
+                  End Turn →
+                </Button>
+              </div>
+            ) : currentTurnPlayer && (
+              <div className="bg-stone-800 border border-stone-700 rounded px-2 py-1">
+                <span className="text-xs text-stone-400">Waiting for <span className="text-amber-400 font-semibold">{currentTurnPlayer.name}</span>…</span>
+              </div>
+            )}
+          </div>
         </div>
-
-        {/* Turn callout */}
-        {isMyTurn ? (
-          <div className="flex items-center justify-between bg-amber-950/60 border border-amber-800 rounded px-3 py-1.5 mb-2">
-            <span className="text-xs font-semibold text-amber-300">⚡ Your turn</span>
-            <Button size="sm" variant="outline" className="h-6 text-xs border-amber-700 text-amber-300 hover:bg-amber-900 py-0 px-2" onClick={onEndTurn}>
-              End Turn →
-            </Button>
-          </div>
-        ) : currentTurnPlayer && (
-          <div className="flex items-center bg-stone-800 border border-stone-700 rounded px-3 py-1.5 mb-2">
-            <span className="text-xs text-stone-400">Waiting for <span className="text-amber-400 font-semibold">{currentTurnPlayer.name}</span>…</span>
-          </div>
-        )}
 
         <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
           {players.map((p) => {
