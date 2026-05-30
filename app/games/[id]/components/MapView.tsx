@@ -12,12 +12,14 @@ interface Props {
   players: PlayerSummary[];
   currentPlayerId: string;
   isMyTurn: boolean;
+  movementRemaining: number;
+  myTools: string[];
   onMove: (targetRoomId: string) => void;
   onPickupArtifact: (gameArtifactId: string) => void;
   onEscape: () => void;
 }
 
-export function MapView({ map, players, currentPlayerId, isMyTurn, onMove, onPickupArtifact, onEscape }: Props) {
+export function MapView({ map, players, currentPlayerId, isMyTurn, movementRemaining, myTools, onMove, onPickupArtifact, onEscape }: Props) {
   const me = players.find((p) => p.id === currentPlayerId);
   const myRoomId = me?.currentRoomId;
   const [inspectArtifact, setInspectArtifact] = useState<RoomView["artifact"]>(null);
@@ -40,7 +42,13 @@ export function MapView({ map, players, currentPlayerId, isMyTurn, onMove, onPic
 
   const myRoom = map.rooms.find((r) => r.id === myRoomId);
   const reachableRoomIds = new Set(
-    map.connections.filter((c) => c.fromRoomId === myRoomId).map((c) => c.toRoomId),
+    map.connections
+      .filter((c) =>
+        c.fromRoomId === myRoomId &&
+        c.movementCost <= movementRemaining &&
+        (!c.requiresTool || myTools.includes(c.requiresTool))
+      )
+      .map((c) => c.toRoomId),
   );
 
   // Stable color per player by turn order

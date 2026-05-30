@@ -149,6 +149,8 @@ export function GameBoard({ gameId, state, playerId, onPlayerSelect, onUpdate }:
               players={state.players}
               currentPlayerId={playerId}
               isMyTurn={isMyTurn}
+              movementRemaining={isMyTurn ? (state.myStats?.movementRemaining ?? 0) : 0}
+              myTools={me.tools}
               onMove={(targetRoomId) => callApi("/move", { playerId, targetRoomId })}
               onPickupArtifact={(gameArtifactId) => callApi("/pickup-artifact", { playerId, gameArtifactId })}
               onEscape={() => callApi("/escape", { playerId })}
