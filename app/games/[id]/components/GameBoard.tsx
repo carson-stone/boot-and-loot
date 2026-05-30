@@ -138,8 +138,8 @@ export function GameBoard({ gameId, state, playerId, onPlayerSelect, onUpdate }:
 
         {/* Market row: full width, three sections side by side */}
         <MarketPanel
-          dynamicMarket={state.dynamicMarket}
-          staticMarket={state.staticMarket}
+          cardOffers={state.dynamicMarket}
+          standardCards={state.staticMarket}
           isMyTurn={isMyTurn}
           myGold={me.gold}
           myRoomIsMarket={state.map.rooms.find((r) => r.id === me.currentRoomId)?.isMarket ?? false}

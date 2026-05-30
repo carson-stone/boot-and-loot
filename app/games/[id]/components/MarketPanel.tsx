@@ -6,8 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 
 interface Props {
-  dynamicMarket: MarketCardView[];
-  staticMarket: StaticMarketView[];
+  cardOffers: MarketCardView[];       // randomly drawn, refreshes as cards are bought
+  standardCards: StaticMarketView[];  // always available
   isMyTurn: boolean;
   myGold: number;
   myRoomIsMarket: boolean;
@@ -18,8 +18,8 @@ interface Props {
 }
 
 export function MarketPanel({
-  dynamicMarket,
-  staticMarket,
+  cardOffers,
+  standardCards,
   isMyTurn,
   myGold,
   myRoomIsMarket,
@@ -32,26 +32,26 @@ export function MarketPanel({
 
   return (
     <div className="grid grid-cols-3 gap-4">
-      {/* Dynamic Market */}
+      {/* Card Offers — randomly drawn, purchasable from anywhere */}
       <Card>
         <CardHeader className="pb-2 pt-3 px-4">
-          <CardTitle className="text-sm">Dynamic Market</CardTitle>
+          <CardTitle className="text-sm">Card Offers</CardTitle>
         </CardHeader>
         <CardContent className="px-4 pb-3">
-          {dynamicMarket.length === 0 ? (
+          {cardOffers.length === 0 ? (
             <p className="text-xs text-slate-600">Empty</p>
           ) : (
             <div className="flex gap-2 flex-wrap">
-              {dynamicMarket.map((card) => (
+              {cardOffers.map((card) => (
                 <div
                   key={card.gameCardId}
                   className={`border rounded p-2 text-xs flex-1 min-w-[120px] max-w-[180px] ${
                     card.isKillableThreat ? "border-red-200 bg-red-50" : "border-slate-200 bg-slate-50"
                   }`}
                 >
-                  <div className="flex justify-between items-start mb-1">
+                  <div className="flex justify-between items-start mb-1 gap-1">
                     <div className="font-semibold text-slate-900 leading-tight">{card.name}</div>
-                    <Badge variant="secondary" className="text-xs ml-1 shrink-0">
+                    <Badge variant="secondary" className="text-xs shrink-0">
                       {card.costGold > 0 ? `${card.costGold}g` : card.isKillableThreat ? "threat" : ""}
                     </Badge>
                   </div>
@@ -86,21 +86,21 @@ export function MarketPanel({
         </CardContent>
       </Card>
 
-      {/* Static Market */}
+      {/* Standard Cards — always available, purchasable from anywhere */}
       <Card>
         <CardHeader className="pb-2 pt-3 px-4">
-          <CardTitle className="text-sm">Static Market</CardTitle>
+          <CardTitle className="text-sm">Standard Cards</CardTitle>
         </CardHeader>
         <CardContent className="px-4 pb-3">
           <div className="flex gap-2 flex-wrap">
-            {staticMarket.map((card) => (
+            {standardCards.map((card) => (
               <div
                 key={card.cardDefinitionId}
                 className="border border-slate-200 rounded p-2 text-xs flex-1 min-w-[110px] max-w-[160px] bg-slate-50"
               >
-                <div className="flex justify-between items-start mb-1">
+                <div className="flex justify-between items-start mb-1 gap-1">
                   <div className="font-semibold text-slate-900 leading-tight">{card.name}</div>
-                  <Badge variant="secondary" className="text-xs ml-1 shrink-0">
+                  <Badge variant="secondary" className="text-xs shrink-0">
                     {card.costGold}g ({card.available})
                   </Badge>
                 </div>
@@ -119,7 +119,7 @@ export function MarketPanel({
         </CardContent>
       </Card>
 
-      {/* Tools — market room required */}
+      {/* Tools — requires a market room */}
       <Card>
         <CardHeader className="pb-2 pt-3 px-4">
           <CardTitle className="text-sm">
@@ -139,9 +139,9 @@ export function MarketPanel({
                 key={tool.code}
                 className="border border-slate-200 rounded p-2 text-xs flex-1 bg-slate-50"
               >
-                <div className="flex justify-between items-start mb-1">
+                <div className="flex justify-between items-start mb-1 gap-1">
                   <div className="font-semibold text-slate-900 leading-tight">{tool.name}</div>
-                  <Badge variant="secondary" className="text-xs ml-1 shrink-0">
+                  <Badge variant="secondary" className="text-xs shrink-0">
                     {tool.cost}g
                   </Badge>
                 </div>

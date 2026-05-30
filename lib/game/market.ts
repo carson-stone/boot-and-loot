@@ -9,17 +9,8 @@ export async function buyCard(
   gameCardId: string,
   turnState: TurnState,
 ) {
-  const player = await prisma.player.findUniqueOrThrow({
-    where: { id: playerId },
-    include: { currentRoom: true },
-  });
-
-  const hasMarketAccess =
-    player.currentRoom?.isMarket || turnState.modifiers.marketAccessFromAnywhere;
-  if (!hasMarketAccess) {
-    throw new GameError("Not in a market room and no market access modifier", "NO_MARKET_ACCESS");
-  }
-
+  // Cards are purchasable from any room — no market room required.
+  // Only tools require a market room (see buyTool).
   const gameCard = await prisma.gameCard.findUniqueOrThrow({
     where: { id: gameCardId },
     include: { cardDefinition: true },
