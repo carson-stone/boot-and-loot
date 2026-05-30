@@ -75,6 +75,16 @@ export function GameLobby({ gameId, state, playerId, onPlayerSelect, onUpdate }:
           <p className="text-sm text-slate-500 mt-1">Game ID: {gameId}</p>
         </div>
 
+        {/* Quick test: open as Player 2 in a new window */}
+        {state.players.length === 1 && (
+          <button
+            onClick={() => window.open(`/games/${gameId}?autoJoin=Player+2`, "_blank")}
+            className="w-full border-2 border-dashed border-slate-300 rounded-lg py-2 text-sm text-slate-500 hover:border-slate-400 hover:text-slate-700 transition-colors"
+          >
+            ⚡ Open as Player 2 →
+          </button>
+        )}
+
         {error && (
           <div className="bg-red-50 border border-red-200 text-red-900 rounded-md px-4 py-2 text-sm">
             {error}

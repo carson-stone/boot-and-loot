@@ -11,13 +11,33 @@ export default function GamePage({ params }: { params: Promise<{ id: string }> }
   const [playerId, setPlayerId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  // Load player ID from localStorage
+  // Load player ID from localStorage; handle ?autoJoin=Name param
   useEffect(() => {
     const stored = localStorage.getItem(`game-${gameId}-player`);
-    setPlayerId(stored);
+    if (stored) {
+      setPlayerId(stored);
+      return;
+    }
+    const autoJoin = new URLSearchParams(window.location.search).get("autoJoin");
+    if (autoJoin) {
+      fetch(`/api/games/${gameId}/join`, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ playerName: autoJoin }),
+      })
+        .then((r) => r.json())
+        .then((player) => {
+          if (player.id) {
+            localStorage.setItem(`game-${gameId}-player`, player.id);
+            setPlayerId(player.id);
+            // Clean up URL param
+            window.history.replaceState({}, "", `/games/${gameId}`);
+          }
+        })
+        .catch(() => {});
+    }
   }, [gameId]);
 
-  // Polling
   const fetchState = useCallback(async () => {
     try {
       const url = playerId

@@ -8,11 +8,41 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 export default function Home() {
   const router = useRouter();
   const [creating, setCreating] = useState(false);
+  const [testing, setTesting] = useState(false);
   const [joining, setJoining] = useState(false);
   const [joinGameId, setJoinGameId] = useState("");
   const [playerName, setPlayerName] = useState("");
   const [maxPlayers, setMaxPlayers] = useState(4);
   const [error, setError] = useState<string | null>(null);
+
+  async function handleQuickTest() {
+    setError(null);
+    setTesting(true);
+    try {
+      const gameRes = await fetch("/api/games", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ mapName: "The Sunken Crypt", maxPlayers: 2 }),
+      });
+      if (!gameRes.ok) throw new Error("Failed to create game");
+      const game = await gameRes.json();
+
+      const p1Res = await fetch(`/api/games/${game.id}/join`, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ playerName: "Player 1" }),
+      });
+      if (!p1Res.ok) throw new Error("Failed to join as Player 1");
+      const p1 = await p1Res.json();
+
+      localStorage.setItem(`game-${game.id}-player`, p1.id);
+      router.push(`/games/${game.id}`);
+    } catch (e) {
+      setError((e as Error).message);
+    } finally {
+      setTesting(false);
+    }
+  }
 
   async function handleCreate() {
     setError(null);
@@ -77,6 +107,14 @@ export default function Home() {
             {error}
           </div>
         )}
+
+        <button
+          onClick={handleQuickTest}
+          disabled={testing}
+          className="w-full border-2 border-dashed border-slate-300 rounded-lg py-3 text-sm text-slate-500 hover:border-slate-400 hover:text-slate-700 transition-colors"
+        >
+          {testing ? "Setting up..." : "⚡ Quick Test — 2-player game, join as Player 1"}
+        </button>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <Card>
