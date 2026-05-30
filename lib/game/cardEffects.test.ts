@@ -64,6 +64,7 @@ function makeCtx(overrides: Partial<PlayContext> = {}): PlayContext {
     cardName: "Test Card",
     cardIsOneTimeUse: false,
     cardType: "device",
+    upgradeableCards: [],
     ...overrides,
   };
 }

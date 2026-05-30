@@ -48,7 +48,15 @@ export async function applyStateDelta(
     });
   }
 
-  // 3. Append action log entries
+  // 3. Apply card upgrades (Alchemy: swap card_definition_id in-place)
+  for (const upgrade of delta.cardUpgrades) {
+    await tx.gameCard.update({
+      where: { id: upgrade.gameCardId },
+      data: { cardDefinitionId: upgrade.newCardDefinitionId },
+    });
+  }
+
+  // 4. Append action log entries
   const turn = await tx.turn.findUniqueOrThrow({ where: { id: turnId } });
   const existingActions = (turn.actions ?? []) as ActionLogEntry[];
   const updatedActions = [...existingActions, ...delta.actionLogEntries];

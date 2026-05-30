@@ -112,6 +112,7 @@ export interface PlayContext {
   cardName: string;                  // human-readable name for action log
   cardIsOneTimeUse: boolean;         // from card_definitions.is_one_time_use
   cardType: "monster" | "device" | "companion" | "spell";
+  upgradeableCards: UpgradeableCard[]; // pre-resolved by route handler for scripted effects
 }
 
 
@@ -144,12 +145,29 @@ export interface PlayerDelta {
   attentionChange: number;
 }
 
+/** A card whose definition should be swapped (e.g. Copper → Silver via Alchemy). */
+export interface CardUpgrade {
+  gameCardId: string;
+  fromCardName: string;
+  toCardName: string;
+  newCardDefinitionId: string;
+}
+
+/** A pre-resolved upgrade candidate passed into PlayContext for scripted effects. */
+export interface UpgradeableCard {
+  gameCardId: string;
+  cardName: string;
+  upgradedDefinitionId: string;
+  upgradedCardName: string;
+}
+
 /** A complete description of what an effect or sequence of effects did. */
 export class StateDelta {
   playerChanges: Map<string, PlayerDelta> = new Map();
   turnResourceChanges: Partial<TurnResources> = {};
   turnModifierChanges: Partial<TurnModifiers> = {};
   cardMovements: CardMovement[] = [];
+  cardUpgrades: CardUpgrade[] = [];
   attentionToFiller: number = 0;       // amount moved from player to shared filler
   actionLogEntries: ActionLogEntry[] = [];
 
@@ -184,9 +202,33 @@ export type ActionLogEntry =
 export type CardScript = (ctx: PlayContext, delta: StateDelta) => void;
 
 export const SCRIPT_REGISTRY: Record<string, CardScript> = {
-  // Currently empty — every card we've designed fits the primitive vocabulary.
-  // Add scripted entries here when a card's behavior genuinely can't be expressed
-  // as a list of primitives. Each script receives the same (ctx, delta) signature.
+  // Alchemy: upgrades up to 3 Copper Coins → Silver, or 1 Silver → Gold Pouch.
+  // Eligible cards are pre-resolved by the play-card route handler and passed via ctx.upgradeableCards.
+  // Alchemy: upgrades up to 3 Copper Coins → Silver, or 1 Silver → Gold Pouch.
+  "alchemy": (ctx, delta) => {
+    const toUpgrade = ctx.upgradeableCards.slice(0, 3);
+    for (const card of toUpgrade) {
+      delta.cardUpgrades.push({
+        gameCardId: card.gameCardId,
+        fromCardName: card.cardName,
+        toCardName: card.upgradedCardName,
+        newCardDefinitionId: card.upgradedDefinitionId,
+      });
+    }
+  },
+
+  // Smelt: converts up to 3 Copper Coins from discard/play area into gold, then trashes them.
+  "smelt": (ctx, delta) => {
+    const coppers = ctx.upgradeableCards.slice(0, 3);
+    if (coppers.length === 0) return;
+    const goldGained = coppers.length * ctx.modifiers.goldMultiplier;
+    const self = delta.playerDelta(ctx.currentPlayer.id);
+    self.goldChange += goldGained;
+    delta.turnResourceChanges.gold = (delta.turnResourceChanges.gold ?? 0) + goldGained;
+    for (const card of coppers) {
+      delta.cardMovements.push({ cardInstanceId: card.gameCardId, from: "player_discard", to: "trashed" });
+    }
+  },
 };
 
 

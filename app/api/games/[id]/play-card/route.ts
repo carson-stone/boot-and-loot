@@ -51,7 +51,35 @@ export async function POST(
 
     // Build context and resolve
     const turnState = await loadTurnState(game.currentTurn.id);
-    const ctx = await buildPlayContext(gameId, playerId, gameCardId, turnState);
+
+    // Pre-load upgrade candidates for Alchemy (scripted effects can't query the DB directly)
+    const upgradeableCards: import("@/lib/game/cardEffects").UpgradeableCard[] = [];
+    if (gameCard.cardDefinition.name === "Alchemy") {
+      const [silverDef, goldDef] = await Promise.all([
+        prisma.cardDefinition.findUnique({ where: { name: "Silver Coin" } }),
+        prisma.cardDefinition.findUnique({ where: { name: "Gold Pouch" } }),
+      ]);
+      const coppers = silverDef ? await prisma.gameCard.findMany({
+        where: { gameId, playerId, location: { in: ["player_discard", "player_play_area"] }, cardDefinition: { name: "Copper Coin" } },
+        take: 3,
+      }) : [];
+      if (coppers.length > 0 && silverDef) {
+        for (const c of coppers) upgradeableCards.push({ gameCardId: c.id, cardName: "Copper Coin", upgradedDefinitionId: silverDef.id, upgradedCardName: "Silver Coin" });
+      } else if (goldDef) {
+        const silver = await prisma.gameCard.findFirst({
+          where: { gameId, playerId, location: { in: ["player_discard", "player_play_area"] }, cardDefinition: { name: "Silver Coin" } },
+        });
+        if (silver) upgradeableCards.push({ gameCardId: silver.id, cardName: "Silver Coin", upgradedDefinitionId: goldDef.id, upgradedCardName: "Gold Pouch" });
+      }
+    } else if (gameCard.cardDefinition.name === "Smelt") {
+      const coppers = await prisma.gameCard.findMany({
+        where: { gameId, playerId, location: { in: ["player_discard", "player_play_area"] }, cardDefinition: { name: "Copper Coin" } },
+        take: 3,
+      });
+      for (const c of coppers) upgradeableCards.push({ gameCardId: c.id, cardName: "Copper Coin", upgradedDefinitionId: "", upgradedCardName: "" });
+    }
+
+    const ctx = await buildPlayContext(gameId, playerId, gameCardId, turnState, upgradeableCards);
     const effects = parseCardEffects(
       gameCard.cardDefinition.effects.map((e) => ({
         display_order: e.displayOrder,

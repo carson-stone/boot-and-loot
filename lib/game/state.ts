@@ -135,6 +135,7 @@ export async function buildPlayContext(
   playerId: string,
   cardInstanceId: string,
   turnState: TurnState,
+  upgradeableCards: import("./cardEffects").UpgradeableCard[] = [],
 ): Promise<PlayContext> {
   const player = await prisma.player.findUniqueOrThrow({ where: { id: playerId } });
   const otherPlayers = await prisma.player.findMany({
@@ -178,6 +179,7 @@ export async function buildPlayContext(
     cardName: gameCard.cardDefinition.name,
     cardIsOneTimeUse: gameCard.cardDefinition.isOneTimeUse,
     cardType: gameCard.cardDefinition.cardType,
+    upgradeableCards,
   };
 }
 
