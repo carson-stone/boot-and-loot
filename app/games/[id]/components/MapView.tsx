@@ -97,6 +97,21 @@ export function MapView({ map, players, currentPlayerId, isMyTurn, movementRemai
                       🔑
                     </text>
                   )}
+                  {conn.movementCost > 1 && (
+                    <g>
+                      <circle cx={mx} cy={my - (conn.requiresTool ? 18 : 0)} r={10} fill="#0f172a" opacity="0.75" />
+                      <text
+                        x={mx}
+                        y={my - (conn.requiresTool ? 18 : 0) + 4}
+                        textAnchor="middle"
+                        fontSize="11"
+                        fontWeight="700"
+                        fill="white"
+                      >
+                        {conn.movementCost}
+                      </text>
+                    </g>
+                  )}
                 </g>
               );
             })}
@@ -202,6 +217,7 @@ export function MapView({ map, players, currentPlayerId, isMyTurn, movementRemai
           <span>👹 Monsters</span>
           <span>🔑 Requires key</span>
           <span>▶ One-way passage</span>
+          <span><span className="inline-flex items-center justify-center w-4 h-4 rounded-full bg-slate-900 text-white text-[9px] font-bold mr-1 align-middle">2</span>Movement cost</span>
         </div>
 
         {/* Current room actions */}
