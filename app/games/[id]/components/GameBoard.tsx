@@ -127,7 +127,7 @@ export function GameBoard({ gameId, state, playerId, onPlayerSelect, onUpdate }:
         />
 
         {/* Col 2: Map */}
-        <div className="flex-1 min-w-0">
+        <div className="flex-1 min-w-0 min-h-0 self-stretch flex flex-col overflow-hidden">
           <MapView
             map={state.map}
             players={state.players}
@@ -180,7 +180,7 @@ export function GameBoard({ gameId, state, playerId, onPlayerSelect, onUpdate }:
         </div>
 
         {/* Col 4: Market (tools) */}
-        <div className="w-56 shrink-0">
+        <div className="w-56 shrink-0 self-stretch">
           <ToolsSection
             isMyTurn={isMyTurn}
             myGold={me.gold}

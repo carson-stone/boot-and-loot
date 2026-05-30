@@ -59,9 +59,9 @@ export function MapView({ map, players, currentPlayerId, isMyTurn, movementRemai
   }
 
   return (
-    <Card>
-      <CardContent className="p-2">
-        <div className="overflow-auto" style={{ maxHeight: "62vh" }}>
+    <Card className="h-full flex flex-col">
+      <CardContent className="p-2 flex-1 flex flex-col overflow-hidden min-h-0">
+        <div className="overflow-auto flex-1 min-h-0">
           <svg width={svgWidth} height={svgHeight} className="block" style={{ background: "#141210" }}>
             {/* Connections — deduplicate bidirectional pairs: only draw once per room pair */}
             {map.connections
