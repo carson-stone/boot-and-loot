@@ -1,15 +1,22 @@
 "use client";
 
-import type { ActionLogView } from "@/lib/game/types";
+import type { ActionLogView, PlayerSummary } from "@/lib/game/types";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useRef, useEffect } from "react";
 
+const PLAYER_COLORS = ["#ef4444", "#3b82f6", "#10b981", "#f59e0b", "#a855f7"];
+
 interface Props {
   log: ActionLogView[];
+  players: PlayerSummary[];
 }
 
-export function ActionLog({ log }: Props) {
+export function ActionLog({ log, players }: Props) {
+  function playerColor(name: string): string {
+    const p = players.find((p) => p.name === name);
+    return PLAYER_COLORS[p?.turnOrder ?? 0] ?? "#64748b";
+  }
   const bottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -40,8 +47,13 @@ export function ActionLog({ log }: Props) {
             <div className="space-y-3 pt-1">
               {turns.map((turn) => (
                 <div key={turn.turnNumber}>
-                  <div className="text-[10px] font-semibold text-slate-500 uppercase tracking-wide mb-1">
-                    Turn {turn.turnNumber} — {turn.playerName}
+                  <div className="text-[10px] font-semibold text-slate-500 uppercase tracking-wide mb-1 flex items-center gap-1.5">
+                    Turn {turn.turnNumber} —
+                    <span
+                      className="inline-block w-2 h-2 rounded-full"
+                      style={{ backgroundColor: playerColor(turn.playerName) }}
+                    />
+                    <span style={{ color: playerColor(turn.playerName) }}>{turn.playerName}</span>
                   </div>
                   <ul className="space-y-0.5">
                     {formatTurnEntries(turn.entries).map((line, i) => (

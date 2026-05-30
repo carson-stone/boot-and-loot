@@ -127,7 +127,7 @@ export function GameBoard({ gameId, state, playerId, onPlayerSelect, onUpdate }:
         {/* Map row: action log + map side by side */}
         <div className="grid grid-cols-12 gap-4">
           <div className="col-span-3">
-            <ActionLog log={state.actionLog} />
+            <ActionLog log={state.actionLog} players={state.players} />
           </div>
           <div className="col-span-9 space-y-3">
             <MapView
