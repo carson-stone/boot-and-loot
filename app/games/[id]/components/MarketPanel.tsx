@@ -60,7 +60,7 @@ export function MarketPanel({
                     key={card.gameCardId}
                     card={card}
                     action={{
-                      label: "Buy",
+                      label: card.isOneTimeUse ? `Use (${card.costGold}g)` : "Buy",
                       variant: "outline",
                       disabled: !isMyTurn || myGold < card.costGold,
                       onClick: () => onBuyCard({ gameCardId: card.gameCardId }),
