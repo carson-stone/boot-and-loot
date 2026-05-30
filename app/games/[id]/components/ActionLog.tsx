@@ -17,13 +17,13 @@ export function ActionLog({ log }: Props) {
       <CardContent>
         <ScrollArea className="h-[60vh]">
           {log.length === 0 ? (
-            <p className="text-xs text-slate-500">No actions yet.</p>
+            <p className="text-xs text-slate-600">No actions yet.</p>
           ) : (
             <ul className="space-y-1">
               {log.map((entry, i) => (
                 <li key={i} className="text-xs border-l-2 border-slate-200 pl-2 py-1">
-                  <span className="text-slate-500 mr-1">{entry.type}:</span>
-                  <span className="text-slate-700">{formatDetails(entry)}</span>
+                  <span className="text-slate-600 mr-1">{entry.type}:</span>
+                  <span className="text-slate-900">{formatDetails(entry)}</span>
                 </li>
               ))}
             </ul>

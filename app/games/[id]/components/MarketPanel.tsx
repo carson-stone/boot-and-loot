@@ -43,7 +43,7 @@ export function MarketPanel({
           <h3 className="text-xs font-semibold text-slate-700 mb-2">Dynamic Market</h3>
           <div className="space-y-1">
             {dynamicMarket.length === 0 ? (
-              <p className="text-xs text-slate-500">Empty</p>
+              <p className="text-xs text-slate-600">Empty</p>
             ) : (
               dynamicMarket.map((card) => (
                 <div
@@ -53,13 +53,13 @@ export function MarketPanel({
                   }`}
                 >
                   <div className="flex justify-between items-start mb-1">
-                    <div className="font-semibold">{card.name}</div>
+                    <div className="font-semibold text-slate-900">{card.name}</div>
                     <Badge variant="secondary" className="text-xs ml-1">
                       {card.costGold > 0 ? `${card.costGold}g` : card.isKillableThreat ? "threat" : ""}
                     </Badge>
                   </div>
                   {card.description && (
-                    <div className="text-slate-600 mb-1 line-clamp-2">{card.description}</div>
+                    <div className="text-slate-700 mb-1 line-clamp-2">{card.description}</div>
                   )}
                   {card.isKillableThreat ? (
                     <Button
@@ -95,7 +95,7 @@ export function MarketPanel({
             {staticMarket.map((card) => (
               <div key={card.cardDefinitionId} className="border border-slate-200 rounded p-2 text-xs bg-slate-50">
                 <div className="flex justify-between items-start mb-1">
-                  <div className="font-semibold">{card.name}</div>
+                  <div className="font-semibold text-slate-900">{card.name}</div>
                   <Badge variant="secondary" className="text-xs ml-1">
                     {card.costGold}g ({card.available})
                   </Badge>
@@ -124,7 +124,7 @@ export function MarketPanel({
             ].map((tool) => (
               <div key={tool.code} className="border border-slate-200 rounded p-2 text-xs bg-slate-50">
                 <div className="flex justify-between items-start mb-1">
-                  <div className="font-semibold">{tool.name}</div>
+                  <div className="font-semibold text-slate-900">{tool.name}</div>
                   <Badge variant="secondary" className="text-xs ml-1">
                     {tool.cost}g
                   </Badge>

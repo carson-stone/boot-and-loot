@@ -19,7 +19,7 @@ export function HandDisplay({ hand, isMyTurn, onPlay }: Props) {
       </CardHeader>
       <CardContent>
         {hand.length === 0 ? (
-          <p className="text-slate-500 text-sm">No cards in hand.</p>
+          <p className="text-slate-600 text-sm">No cards in hand.</p>
         ) : (
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2">
             {hand.map((card) => (
@@ -28,7 +28,7 @@ export function HandDisplay({ hand, isMyTurn, onPlay }: Props) {
                 className="border border-slate-200 rounded-md p-3 bg-slate-50 hover:bg-white transition-colors"
               >
                 <div className="flex items-start justify-between mb-1">
-                  <div className="font-semibold text-sm">{card.name}</div>
+                  <div className="font-semibold text-sm text-slate-900">{card.name}</div>
                   <Badge variant="secondary" className="text-xs">
                     {card.cardType}
                   </Badge>

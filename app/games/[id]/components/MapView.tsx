@@ -40,6 +40,12 @@ export function MapView({ map, players, currentPlayerId, isMyTurn, onMove, onPic
     map.connections.filter((c) => c.fromRoomId === myRoomId).map((c) => c.toRoomId),
   );
 
+  // Stable color per player by turn order
+  const PLAYER_COLORS = ["#ef4444", "#3b82f6", "#10b981", "#f59e0b", "#a855f7"];
+  function playerColor(p: PlayerSummary) {
+    return PLAYER_COLORS[p.turnOrder] ?? "#64748b";
+  }
+
   return (
     <Card>
       <CardContent className="p-2">
@@ -101,32 +107,49 @@ export function MapView({ map, players, currentPlayerId, isMyTurn, onMove, onPic
                   }}
                 >
                   <rect
-                    x={c.x - 50}
+                    x={c.x - 52}
                     y={c.y - 32}
-                    width={100}
-                    height={64}
+                    width={104}
+                    height={70}
                     fill={fill}
                     stroke={isReachable && isMyTurn ? "#0ea5e9" : "#cbd5e1"}
                     strokeWidth={isReachable && isMyTurn ? 2 : 1}
                     rx={6}
                   />
-                  <text x={c.x} y={c.y - 14} textAnchor="middle" fontSize="9" fontWeight="600">
+                  <text x={c.x} y={c.y - 16} textAnchor="middle" fontSize="9" fontWeight="600" fill="#1e293b">
                     {room.name}
                   </text>
-                  <text x={c.x} y={c.y - 2} textAnchor="middle" fontSize="8" fill="#64748b">
+                  <text x={c.x} y={c.y - 4} textAnchor="middle" fontSize="8" fill="#475569">
                     {room.isMarket && "🏪"}
                     {room.hasArtifactSlot && room.artifact && "💎"}
                     {room.monsterCount > 0 && `👹${room.monsterCount}`}
                     {room.isEntrance && "🚪"}
                   </text>
-                  {playersHere.length > 0 && (
-                    <text x={c.x} y={c.y + 12} textAnchor="middle" fontSize="8" fill="#0f172a">
-                      {playersHere.map((p) => p.name[0]).join("")}
-                    </text>
-                  )}
-                  {playersHere.some((p) => p.id === currentPlayerId) && (
-                    <circle cx={c.x + 38} cy={c.y - 24} r={5} fill="#0ea5e9" />
-                  )}
+                  {/* Player tokens — colored circles with initial, spread horizontally */}
+                  {playersHere.map((p, idx) => {
+                    const total = playersHere.length;
+                    const spread = (total - 1) * 13;
+                    const tx = c.x - spread / 2 + idx * 26;
+                    const ty = c.y + 18;
+                    const isMe = p.id === currentPlayerId;
+                    return (
+                      <g key={p.id}>
+                        {/* outer ring for current player */}
+                        {isMe && <circle cx={tx} cy={ty} r={13} fill="white" stroke={playerColor(p)} strokeWidth={2} />}
+                        <circle cx={tx} cy={ty} r={10} fill={playerColor(p)} />
+                        <text
+                          x={tx}
+                          y={ty + 4}
+                          textAnchor="middle"
+                          fontSize="10"
+                          fontWeight="700"
+                          fill="white"
+                        >
+                          {p.name[0]?.toUpperCase()}
+                        </text>
+                      </g>
+                    );
+                  })}
                 </g>
               );
             })}
@@ -137,8 +160,8 @@ export function MapView({ map, players, currentPlayerId, isMyTurn, onMove, onPic
         {myRoom && (
           <div className="border-t border-slate-200 pt-3 mt-3 flex items-center justify-between gap-2 flex-wrap">
             <div className="text-sm">
-              <span className="text-slate-500">You're in:</span>{" "}
-              <span className="font-semibold">{myRoom.name}</span>
+              <span className="text-slate-600">You're in:</span>{" "}
+              <span className="font-semibold text-slate-900">{myRoom.name}</span>
               {myRoom.monsterCount > 0 && (
                 <Badge variant="threat" className="ml-2">
                   {myRoom.monsterCount} monster{myRoom.monsterCount > 1 ? "s" : ""}
