@@ -115,16 +115,7 @@ export function GameBoard({ gameId, state, playerId, onPlayerSelect, onUpdate }:
         {/* Turn banner */}
         {isMyTurn ? (
           <div className="flex items-center justify-between bg-green-600 text-white rounded-lg px-5 py-3">
-            <div className="flex items-center gap-3">
-              <span className="text-lg font-bold">⚡ Your turn!</span>
-              {me && (
-                <span className="text-green-100 text-sm">
-                  {(state.myStats?.movementRemaining ?? 0) > 0 && `👟 ${state.myStats!.movementRemaining} `}
-                  {(state.myStats?.attacksRemaining ?? 0) > 0 && `⚔️ ${state.myStats!.attacksRemaining} `}
-                  💰 {me.gold}
-                </span>
-              )}
-            </div>
+            <span className="text-lg font-bold">⚡ Your turn!</span>
             <Button
               onClick={() => callApi("/end-turn", { playerId })}
               variant="outline"
