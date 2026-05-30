@@ -114,7 +114,7 @@ export function MarketPanel({
             ].map((tool) => {
               const owned = myTools.includes(tool.code);
               return (
-                <div key={tool.code} className="w-44 h-72 shrink-0 flex flex-col rounded-lg border border-slate-200 bg-white p-3 text-xs">
+                <div key={tool.code} className="w-44 h-60 shrink-0 flex flex-col rounded-lg border border-slate-200 bg-white p-3 text-xs">
                   <div className="flex items-start justify-between gap-1 mb-1">
                     <div className="font-bold text-sm text-slate-900 leading-tight">{tool.name}</div>
                     <span className="text-xs font-semibold text-amber-700 shrink-0">{tool.cost}g</span>
