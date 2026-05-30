@@ -27,7 +27,7 @@ export function HoverHand({ hand, isMyTurn, onPlay }: Props) {
           open ? "w-52 opacity-100" : "w-0 opacity-0"
         }`}
       >
-        <div className="w-52 max-h-[90vh] overflow-y-auto bg-stone-900 border-r border-stone-600 shadow-2xl flex flex-col gap-2 p-2">
+        <div className="w-52 min-h-[300px] max-h-[90vh] overflow-y-auto bg-stone-900 border-r border-stone-600 shadow-2xl flex flex-col gap-2 p-2">
           <div className="flex items-center justify-between mb-1 px-1">
             <span className="font-display text-xs text-amber-300 tracking-widest uppercase">Hand</span>
             <button
