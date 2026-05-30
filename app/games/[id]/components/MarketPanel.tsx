@@ -4,10 +4,11 @@ import type { MarketCardView, StaticMarketView } from "@/lib/game/types";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { GameCardTile } from "./GameCardTile";
 
 interface Props {
-  cardOffers: MarketCardView[];       // randomly drawn, refreshes as cards are bought
-  standardCards: StaticMarketView[];  // always available
+  cardOffers: MarketCardView[];
+  standardCards: StaticMarketView[];
   isMyTurn: boolean;
   myGold: number;
   myRoomIsMarket: boolean;
@@ -32,94 +33,70 @@ export function MarketPanel({
 
   return (
     <div className="grid grid-cols-3 gap-4">
-      {/* Card Offers — randomly drawn, purchasable from anywhere */}
+      {/* Card Offers */}
       <Card>
         <CardHeader className="pb-2 pt-3 px-4">
           <CardTitle className="text-sm">Card Offers</CardTitle>
         </CardHeader>
-        <CardContent className="px-4 pb-3">
+        <CardContent className="px-4 pb-4">
           {cardOffers.length === 0 ? (
             <p className="text-xs text-slate-600">Empty</p>
           ) : (
-            <div className="flex gap-2 flex-wrap">
-              {cardOffers.map((card) => (
-                <div
-                  key={card.gameCardId}
-                  className={`border rounded p-2 text-xs flex-1 min-w-[120px] max-w-[180px] ${
-                    card.isKillableThreat ? "border-red-200 bg-red-50" : "border-slate-200 bg-slate-50"
-                  }`}
-                >
-                  <div className="flex justify-between items-start mb-1 gap-1">
-                    <div className="font-semibold text-slate-900 leading-tight">{card.name}</div>
-                    <Badge variant="secondary" className="text-xs shrink-0">
-                      {card.costGold > 0 ? `${card.costGold}g` : card.isKillableThreat ? "threat" : ""}
-                    </Badge>
-                  </div>
-                  {card.description && (
-                    <div className="text-slate-700 mb-2 text-[11px] leading-tight line-clamp-2">{card.description}</div>
-                  )}
-                  {card.isKillableThreat ? (
-                    <Button
-                      size="sm"
-                      variant="destructive"
-                      className="w-full h-7 text-xs"
-                      disabled={!isMyTurn}
-                      onClick={() => onResolveThreat(card)}
-                    >
-                      Resolve
-                    </Button>
-                  ) : (
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="w-full h-7 text-xs"
-                      disabled={!isMyTurn || myGold < card.costGold}
-                      onClick={() => onBuyCard({ gameCardId: card.gameCardId })}
-                    >
-                      Buy
-                    </Button>
-                  )}
-                </div>
-              ))}
+            <div className="flex gap-3 overflow-x-auto pb-1">
+              {cardOffers.map((card) =>
+                card.isKillableThreat ? (
+                  <GameCardTile
+                    key={card.gameCardId}
+                    card={card}
+                    action={{
+                      label: "Resolve",
+                      variant: "destructive",
+                      disabled: !isMyTurn,
+                      onClick: () => onResolveThreat(card),
+                    }}
+                  />
+                ) : (
+                  <GameCardTile
+                    key={card.gameCardId}
+                    card={card}
+                    action={{
+                      label: "Buy",
+                      variant: "outline",
+                      disabled: !isMyTurn || myGold < card.costGold,
+                      onClick: () => onBuyCard({ gameCardId: card.gameCardId }),
+                    }}
+                  />
+                )
+              )}
             </div>
           )}
         </CardContent>
       </Card>
 
-      {/* Standard Cards — always available, purchasable from anywhere */}
+      {/* Standard Cards */}
       <Card>
         <CardHeader className="pb-2 pt-3 px-4">
           <CardTitle className="text-sm">Standard Cards</CardTitle>
         </CardHeader>
-        <CardContent className="px-4 pb-3">
-          <div className="flex gap-2 flex-wrap">
+        <CardContent className="px-4 pb-4">
+          <div className="flex gap-3 overflow-x-auto pb-1">
             {standardCards.map((card) => (
-              <div
+              <GameCardTile
                 key={card.cardDefinitionId}
-                className="border border-slate-200 rounded p-2 text-xs flex-1 min-w-[110px] max-w-[160px] bg-slate-50"
-              >
-                <div className="flex justify-between items-start mb-1 gap-1">
-                  <div className="font-semibold text-slate-900 leading-tight">{card.name}</div>
-                  <Badge variant="secondary" className="text-xs shrink-0">
-                    {card.costGold}g ({card.available})
-                  </Badge>
-                </div>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  className="w-full h-7 text-xs"
-                  disabled={!isMyTurn || myGold < card.costGold || card.available === 0}
-                  onClick={() => onBuyCard({ cardDefinitionId: card.cardDefinitionId })}
-                >
-                  Buy
-                </Button>
-              </div>
+                card={{ ...card, available: card.available }}
+                action={{
+                  label: "Buy",
+                  variant: "outline",
+                  disabled: !isMyTurn || myGold < card.costGold || card.available === 0,
+                  onClick: () => onBuyCard({ cardDefinitionId: card.cardDefinitionId }),
+                }}
+              />
             ))}
           </div>
         </CardContent>
       </Card>
 
-      {/* Tools — requires a market room */}
+      {/* Tools */}
       <Card>
         <CardHeader className="pb-2 pt-3 px-4">
           <CardTitle className="text-sm">
@@ -129,34 +106,44 @@ export function MarketPanel({
             )}
           </CardTitle>
         </CardHeader>
-        <CardContent className="px-4 pb-3">
-          <div className="flex gap-2">
+        <CardContent className="px-4 pb-4">
+          <div className="flex gap-3 overflow-x-auto pb-1">
             {[
-              { code: "skeleton_key", name: "Skeleton Key", cost: 8, description: "Unlocks sealed passages" },
-              { code: "backpack", name: "Backpack", cost: 10, description: "Carry 2 artifacts" },
-            ].map((tool) => (
-              <div
-                key={tool.code}
-                className="border border-slate-200 rounded p-2 text-xs flex-1 bg-slate-50"
-              >
-                <div className="flex justify-between items-start mb-1 gap-1">
-                  <div className="font-semibold text-slate-900 leading-tight">{tool.name}</div>
-                  <Badge variant="secondary" className="text-xs shrink-0">
-                    {tool.cost}g
-                  </Badge>
+              { code: "skeleton_key", name: "Skeleton Key", cost: 8, description: "Unlocks tool-gated passages permanently." },
+              { code: "backpack", name: "Backpack", cost: 10, description: "Increases your artifact carrying capacity to 2." },
+            ].map((tool) => {
+              const owned = myTools.includes(tool.code);
+              return (
+                <div key={tool.code} className="w-44 shrink-0 flex flex-col rounded-lg border border-slate-200 bg-white p-3 text-xs">
+                  <div className="flex items-start justify-between gap-1 mb-1">
+                    <div className="font-bold text-sm text-slate-900 leading-tight">{tool.name}</div>
+                    <span className="text-xs font-semibold text-amber-700 shrink-0">{tool.cost}g</span>
+                  </div>
+                  <div className="mb-2">
+                    <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-slate-100 text-slate-700">
+                      tool
+                    </span>
+                    {owned && (
+                      <span className="ml-1 text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-green-100 text-green-800">
+                        owned
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-slate-700 leading-snug mb-2">{tool.description}</p>
+                  <div className="mt-auto pt-2">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="w-full h-7 text-xs"
+                      disabled={!canBuyTools || myGold < tool.cost || owned}
+                      onClick={() => onBuyTool(tool.code)}
+                    >
+                      {owned ? "Owned" : "Buy"}
+                    </Button>
+                  </div>
                 </div>
-                <div className="text-slate-600 text-[11px] mb-2">{tool.description}</div>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  className="w-full h-7 text-xs"
-                  disabled={!canBuyTools || myGold < tool.cost || myTools.includes(tool.code)}
-                  onClick={() => onBuyTool(tool.code)}
-                >
-                  {myTools.includes(tool.code) ? "Owned" : "Buy"}
-                </Button>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </CardContent>
       </Card>
