@@ -30,24 +30,24 @@ function effectLabel(e: EffectView): string {
   const type = e.effectType;
   const n = e.amount;
   switch (type) {
-    case "gain_gold":       return `+${n} gold`;
-    case "gain_movement":   return `+${n} movement`;
-    case "gain_attack":     return `+${n} attack`;
-    case "gain_attention":  return `+${n} attention`;
-    case "draw_cards":      return `draw ${n}`;
-    case "heal":            return `heal ${n}`;
-    case "remove_attention":return `-${n} attention`;
-    case "redirect_attention_to_filler": return `redirect ${n} attention`;
-    case "all_others_gain_attention": return `others +${n} attn`;
-    case "all_others_lose_gold_this_turn": return `others −${n} gold`;
-    case "multiply_gold_this_turn": return `gold ×${n}`;
-    case "multiply_attack_this_turn": return `attack ×${n}`;
-    case "reduce_attention_generated_this_turn": return `−${n} attn gen`;
-    case "all_cards_zero_attention_this_turn": return `0 attn this turn`;
-    case "prevent_damage_this_turn": return `prevent ${n} dmg`;
+    case "gain_gold":                            return `💰 +${n}`;
+    case "gain_movement":                        return `👟 +${n}`;
+    case "gain_attack":                          return `⚔️ +${n}`;
+    case "gain_attention":                       return `👁 +${n}`;
+    case "draw_cards":                           return `🂠 draw ${n}`;
+    case "heal":                                 return `❤️ heal ${n}`;
+    case "remove_attention":                     return `👁 −${n}`;
+    case "redirect_attention_to_filler":         return `👁 redirect ${n}`;
+    case "all_others_gain_attention":            return `👁 others +${n}`;
+    case "all_others_lose_gold_this_turn":       return `💰 others −${n}`;
+    case "multiply_gold_this_turn":              return `💰 ×${n} this turn`;
+    case "multiply_attack_this_turn":            return `⚔️ ×${n} this turn`;
+    case "reduce_attention_generated_this_turn": return `👁 −${n} generated`;
+    case "all_cards_zero_attention_this_turn":   return `👁 0 this turn`;
+    case "prevent_damage_this_turn":             return `🛡 ${n} dmg prevented`;
     case "conditional_gain_attack_if_monsters_played":
-      return `+${(e.parametersJson as Record<string,number>).bonus} atk (3+ monsters)`;
-    case "grant_market_access_this_turn": return `market access`;
+      return `⚔️ +${(e.parametersJson as Record<string,number>).bonus} (3+ monsters)`;
+    case "grant_market_access_this_turn":        return `🏪 market access`;
     default: return type.replace(/_/g, " ");
   }
 }
@@ -119,17 +119,17 @@ export function GameCardTile({ card, action }: GameCardTileProps) {
             <div key={opt.id} className="text-[10px] text-slate-600 leading-snug">
               <span className="font-semibold text-slate-800">{opt.label}:</span>{" "}
               {[
-                opt.costAttacks > 0 && `${opt.costAttacks} atk`,
-                opt.costGold > 0 && `${opt.costGold}g`,
-                opt.costAttention > 0 && `${opt.costAttention} attn`,
-                opt.costHealth > 0 && `${opt.costHealth} hp`,
+                opt.costAttacks > 0 && `⚔️ ${opt.costAttacks}`,
+                opt.costGold > 0 && `💰 ${opt.costGold}`,
+                opt.costAttention > 0 && `👁 ${opt.costAttention}`,
+                opt.costHealth > 0 && `❤️ ${opt.costHealth}`,
               ]
                 .filter(Boolean)
                 .join(" + ")}
               {" → "}
               {[
-                opt.rewardGold > 0 && `${opt.rewardGold}g`,
-                opt.rewardReputation > 0 && `${opt.rewardReputation} rep`,
+                opt.rewardGold > 0 && `💰 ${opt.rewardGold}`,
+                opt.rewardReputation > 0 && `🏆 ${opt.rewardReputation}`,
               ]
                 .filter(Boolean)
                 .join(" + ") || "—"}
