@@ -123,7 +123,7 @@ async function main() {
     { name: "Map Fragment", cardType: "device", pool: "dynamic", costFocus: 3, description: "A torn corner of a larger map.", totalQuantity: 4, effects: [{ displayOrder: 0, effectType: "gain_movement", amount: 1 }, { displayOrder: 1, effectType: "draw_cards", amount: 1 }] },
     { name: "Cultist", cardType: "monster", pool: "dynamic", costGold: 0, isKillableThreat: true, description: "A fanatic offering a deal. Fight or pay the price.", totalQuantity: 3, resolutionOptions: [
       { label: "Fight", displayOrder: 0, costAttacks: 2, rewardGold: 3, rewardReputation: 1 },
-      { label: "Sacrifice", displayOrder: 1, costHealth: 2, rewardGold: 5, rewardReputation: 2 },
+      { label: "Purify", displayOrder: 1, costHealth: 2, rewardGold: 5, rewardReputation: 2 },
     ]},
 
     // ---- Dynamic: broad effects ----
@@ -171,7 +171,7 @@ async function main() {
     // ---- Dynamic: killable threats (non-horde) ----
     { name: "Venomous Serpent", cardType: "monster", pool: "dynamic", isKillableThreat: true, description: "Coiled and patient. The bite costs more than the kill.", totalQuantity: 2, resolutionOptions: [
       { label: "Fight", displayOrder: 0, costAttacks: 2, rewardGold: 3 },
-      { label: "Sacrifice", displayOrder: 1, costHealth: 1, rewardGold: 5, rewardReputation: 1 },
+      { label: "Purify", displayOrder: 1, costHealth: 1, rewardGold: 5, rewardReputation: 1 },
     ]},
     { name: "Phantom", cardType: "monster", pool: "dynamic", isKillableThreat: true, description: "Incorporeal and ancient. Steel barely slows it; gold does not buy its mercy cheaply.", totalQuantity: 2, resolutionOptions: [
       { label: "Fight", displayOrder: 0, costAttacks: 4, rewardGold: 6, rewardReputation: 1 },
@@ -199,7 +199,7 @@ async function main() {
     { name: "Crypt Lord", cardType: "monster", pool: "dynamic", costGold: 0, triggersHorde: true, isKillableThreat: true, description: "Hazard. The deepest dweller. A great kill — for great cost.", totalQuantity: 2, resolutionOptions: [
       { label: "Fight", displayOrder: 0, costAttacks: 5, rewardGold: 8, rewardReputation: 3 },
       { label: "Bribe", displayOrder: 1, costGold: 10, rewardReputation: 2 },
-      { label: "Sacrifice", displayOrder: 2, costHealth: 3, rewardGold: 6, rewardReputation: 4 },
+      { label: "Purify", displayOrder: 2, costHealth: 3, rewardGold: 6, rewardReputation: 4 },
     ]},
     { name: "The Collector", cardType: "companion", pool: "dynamic", costGold: 0, triggersHorde: true, isKillableThreat: true, description: "Hazard. A grim trader who appraises your effects. Fight or trade cards.", totalQuantity: 2, resolutionOptions: [
       { label: "Fight", displayOrder: 0, costAttacks: 3, rewardGold: 4 },
