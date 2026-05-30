@@ -25,9 +25,9 @@ export async function loadTurnState(turnId: string): Promise<TurnState> {
   };
   const playCounts: PlayCounts = { monsters: 0, devices: 0, companions: 0 };
   let goldGained = 0;
-  let goldSpent = turn.goldSpent;
-  let movementUsed = turn.movementUsed;
-  let attacksUsed = turn.attacksUsed;
+  let goldSpent = 0;         // derived from action log (buy_card, buy_tool entries)
+  let movementUsed = 0;      // derived from action log (move entries)
+  const attacksUsed = turn.attacksUsed; // derived from DB — room combat isn't in the log
 
   for (const action of actions) {
     if (action.type === "effect_resolved") {
@@ -82,9 +82,10 @@ export async function loadTurnState(turnId: string): Promise<TurnState> {
       // We need to look up card type to count plays — fetch it
     }
 
-    if (action.type === "buy_card") {
-      goldSpent += (action as { gold_paid: number }).gold_paid;
-      resources.gold -= (action as { gold_paid: number }).gold_paid;
+    if (action.type === "buy_card" || action.type === "buy_tool") {
+      const paid = (action as { gold_paid: number }).gold_paid;
+      goldSpent += paid;
+      resources.gold -= paid;
     }
 
     if (action.type === "move") {
