@@ -249,15 +249,10 @@ export function MapView({ map, players, currentPlayerId, isMyTurn, movementRemai
 
         {/* Current room actions */}
         {myRoom && (
-          <div className="border-t border-slate-200 pt-3 mt-3 flex items-center justify-between gap-2 flex-wrap">
+          <div className="border-t border-stone-700 pt-3 mt-3 flex items-center justify-between gap-2 flex-wrap">
             <div className="text-sm">
-              <span className="text-slate-600">You're in:</span>{" "}
-              <span className="font-semibold text-slate-900">{myRoom.name}</span>
-              {myRoom.monsterCount > 0 && (
-                <Badge variant="threat" className="ml-2">
-                  {myRoom.monsterCount} monster{myRoom.monsterCount > 1 ? "s" : ""}
-                </Badge>
-              )}
+              <span className="text-stone-400">You're in:</span>{" "}
+              <span className="font-semibold text-stone-100">{myRoom.name}</span>
             </div>
             <div className="flex gap-2">
               {myRoom.artifact && me && me.artifactCount < (me.tools.includes("backpack") ? 2 : 1) && (
