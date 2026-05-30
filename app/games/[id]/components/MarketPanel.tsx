@@ -109,40 +109,37 @@ export function MarketPanel({
           </CardTitle>
         </CardHeader>
         <CardContent className="px-4 pb-4">
-          <div className="flex gap-3 overflow-x-auto pb-1">
+          <div className="flex gap-3 flex-wrap">
             {[
-              { code: "skeleton_key", name: "Skeleton Key", cost: 8, description: "Unlocks tool-gated passages permanently." },
-              { code: "backpack", name: "Backpack", cost: 10, description: "Increases your artifact carrying capacity to 2." },
+              { code: "skeleton_key", name: "Skeleton Key", cost: 8, description: "Unlocks all key-gated passages permanently.", icon: "🔑" },
+              { code: "backpack", name: "Backpack", cost: 10, description: "Carry up to 2 artifacts.", icon: "🎒" },
             ].map((tool) => {
               const owned = myTools.includes(tool.code);
               return (
-                <div key={tool.code} className="w-44 h-60 shrink-0 flex flex-col rounded-lg border border-slate-200 bg-white p-3 text-xs">
-                  <div className="flex items-start justify-between gap-1 mb-1">
-                    <div className="font-bold text-sm text-slate-900 leading-tight">{tool.name}</div>
-                    <span className="text-xs font-semibold text-amber-700 shrink-0">{tool.cost}g</span>
+                <div key={tool.code} className={`flex items-center gap-3 rounded-lg border px-4 py-3 ${owned ? "border-green-700 bg-green-950/30" : "border-stone-600 bg-stone-800/60"}`}>
+                  <span className="text-2xl shrink-0">{tool.icon}</span>
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-2">
+                      <span className="font-display text-sm text-stone-100 font-semibold">{tool.name}</span>
+                      {owned
+                        ? <span className="text-xs text-green-400 font-semibold">Owned</span>
+                        : <span className="text-xs text-amber-400 font-semibold">💰 {tool.cost}g</span>}
+                    </div>
+                    <p className="text-xs text-stone-400 mt-0.5">{tool.description}</p>
                   </div>
-                  <div className="mb-2">
-                    <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-slate-100 text-slate-700">
-                      tool
-                    </span>
-                    {owned && (
-                      <span className="ml-1 text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-green-100 text-green-800">
-                        owned
-                      </span>
-                    )}
-                  </div>
-                  <p className="text-slate-700 leading-snug mb-2">{tool.description}</p>
-                  <div className="mt-auto pt-2">
+                  {!owned && (
+                  <div className="shrink-0 ml-2">
                     <Button
                       size="sm"
                       variant="outline"
-                      className="w-full h-7 text-xs"
-                      disabled={!canBuyTools || myGold < tool.cost || owned}
+                      className="h-7 text-xs"
+                      disabled={!canBuyTools || myGold < tool.cost}
                       onClick={() => onBuyTool(tool.code)}
                     >
-                      {owned ? "Owned" : "Buy"}
+                      Buy
                     </Button>
                   </div>
+                  )}
                 </div>
               );
             })}
