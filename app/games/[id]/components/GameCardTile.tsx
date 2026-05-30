@@ -67,8 +67,12 @@ export function GameCardTile({ card, action }: GameCardTileProps) {
 
   return (
     <div
-      className={`w-44 h-60 shrink-0 flex flex-col rounded-lg border p-3 text-xs ${
-        isThreat ? "border-red-300 bg-red-50" : "border-slate-200 bg-white"
+      className={`w-44 h-60 shrink-0 flex flex-col rounded-lg border-2 p-3 text-xs ${
+        isThreat
+          ? "border-red-300 bg-red-50"
+          : card.isOneTimeUse
+          ? "border-amber-400 bg-amber-50"
+          : "border-slate-200 bg-white"
       }`}
     >
       {/* Header row: name + cost */}
