@@ -1,9 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import type { PlayerSummary, MyTurnStats, HandCardView } from "@/lib/game/types";
+import type { PlayerSummary, MyTurnStats } from "@/lib/game/types";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { GameCardTile } from "./GameCardTile";
 
 interface Props {
   players: PlayerSummary[];
@@ -145,16 +146,16 @@ export function PlayerStatusBar({ players, currentTurnPlayerId, turnNumber, myPl
       {/* Discard pile modal */}
       {discardOpen && myStats && (
         <Dialog open onOpenChange={(open) => !open && setDiscardOpen(false)}>
-          <DialogContent className="max-w-lg">
+          <DialogContent className="max-w-4xl">
             <DialogHeader>
               <DialogTitle>Discard Pile ({myStats.discardPile.length})</DialogTitle>
             </DialogHeader>
             {myStats.discardPile.length === 0 ? (
-              <p className="text-sm text-slate-500">Empty</p>
+              <p className="text-sm text-slate-600">Empty</p>
             ) : (
-              <div className="grid grid-cols-2 gap-2 max-h-96 overflow-y-auto">
+              <div className="flex gap-3 overflow-x-auto pb-2">
                 {myStats.discardPile.map((card) => (
-                  <DiscardCard key={card.gameCardId} card={card} />
+                  <GameCardTile key={card.gameCardId} card={card} />
                 ))}
               </div>
             )}
@@ -162,22 +163,5 @@ export function PlayerStatusBar({ players, currentTurnPlayerId, turnNumber, myPl
         </Dialog>
       )}
     </>
-  );
-}
-
-function DiscardCard({ card }: { card: HandCardView }) {
-  return (
-    <div className="border border-slate-200 rounded p-2 text-xs bg-slate-50">
-      <div className="font-semibold text-slate-900">{card.name}</div>
-      {card.description && <div className="text-slate-600 mt-0.5 text-[11px]">{card.description}</div>}
-      <div className="flex gap-1 mt-1 flex-wrap">
-        {card.effects.map((e, i) => (
-          <Badge key={i} variant="outline" className="text-[10px] px-1 py-0">
-            {e.effectType.replace(/_/g, " ")} {e.amount ? `+${e.amount}` : ""}
-          </Badge>
-        ))}
-      </div>
-      {card.isOneTimeUse && <Badge variant="destructive" className="text-[10px] mt-1">one-time</Badge>}
-    </div>
   );
 }
