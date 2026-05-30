@@ -11,6 +11,7 @@ interface Props {
   standardCards: StaticMarketView[];
   isMyTurn: boolean;
   myGold: number;
+  myFocus: number;
   myRoomIsMarket: boolean;
   myTools: string[];
   onBuyCard: (params: { gameCardId?: string; cardDefinitionId?: string }) => void;
@@ -23,6 +24,7 @@ export function MarketPanel({
   standardCards,
   isMyTurn,
   myGold,
+  myFocus,
   myRoomIsMarket,
   myTools,
   onBuyCard,
@@ -62,7 +64,7 @@ export function MarketPanel({
                     action={{
                       label: card.isOneTimeUse ? `Use (${card.costGold}g)` : "Buy",
                       variant: "outline",
-                      disabled: !isMyTurn || myGold < card.costGold,
+                      disabled: !isMyTurn || myFocus < card.costFocus || myGold < card.costGold,
                       onClick: () => onBuyCard({ gameCardId: card.gameCardId }),
                     }}
                   />

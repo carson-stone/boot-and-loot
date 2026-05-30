@@ -29,10 +29,10 @@ export async function endTurn(gameId: string, playerId: string) {
       data: { location: "player_discard" },
     });
 
-    // 2. Reset player's gold (unspent gold doesn't carry over)
+    // 2. Reset focus (ephemeral — doesn't carry over); gold is persistent and stays
     await tx.player.update({
       where: { id: playerId },
-      data: { gold: 0 },
+      data: { focus: 0 },
     });
 
     // 3. Complete current turn

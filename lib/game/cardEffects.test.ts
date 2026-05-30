@@ -45,6 +45,8 @@ function makePlayer(overrides: Partial<PlayerView> = {}): PlayerView {
     maxHealth: 10,
     gold: 0,
     goldGainedThisTurn: 0,
+    focus: 0,
+    focusGainedThisTurn: 0,
     attention: 0,
     isDead: false,
     hasExited: false,
@@ -57,7 +59,7 @@ function makeCtx(overrides: Partial<PlayContext> = {}): PlayContext {
   return {
     currentPlayer: current,
     otherPlayers: [makePlayer({ id: "p2" }), makePlayer({ id: "p3" })],
-    turnResources: { gold: 0, movement: 0, attacks: 0, cardsToDraw: 0 },
+    turnResources: { focus: 0, movement: 0, attacks: 0, cardsToDraw: 0 },
     modifiers: { ...DEFAULT_TURN_MODIFIERS },
     playCounts: { monsters: 0, devices: 0, companions: 0 },
     cardInstanceId: "card-instance-1",
@@ -71,12 +73,20 @@ function makeCtx(overrides: Partial<PlayContext> = {}): PlayContext {
 
 console.log("\n=== BASIC PRIMITIVES ===");
 
-test("gain_gold adds gold to current player", () => {
+test("gain_gold adds gold to current player (persistent)", () => {
   const ctx = makeCtx();
   const delta = new StateDelta();
   applyEffect({ type: "gain_gold", amount: 3 }, ctx, delta);
   assertEqual(delta.playerDelta("p1").goldChange, 3, "gold change");
-  assertEqual(delta.turnResourceChanges.gold ?? 0, 3, "turn gold");
+  // gold no longer tracked in turnResourceChanges — it's persistent on player
+});
+
+test("gain_focus adds focus to current player", () => {
+  const ctx = makeCtx();
+  const delta = new StateDelta();
+  applyEffect({ type: "gain_focus", amount: 3 }, ctx, delta);
+  assertEqual(delta.playerDelta("p1").focusChange, 3, "focus change");
+  assertEqual(delta.turnResourceChanges.focus ?? 0, 3, "turn focus");
 });
 
 test("gain_movement adds to turn resources", () => {
@@ -111,7 +121,7 @@ test("all_others_gain_attention skips self, hits others", () => {
   assertEqual(delta.playerDelta("p3").attentionChange, 1, "p3 +1");
 });
 
-test("all_others_lose_gold_this_turn respects each player's current gold", () => {
+test("all_others_lose_gold permanently steals gold from other players", () => {
   const ctx = makeCtx({
     otherPlayers: [
       makePlayer({ id: "p2", gold: 3 }),
@@ -119,7 +129,7 @@ test("all_others_lose_gold_this_turn respects each player's current gold", () =>
     ],
   });
   const delta = new StateDelta();
-  applyEffect({ type: "all_others_lose_gold_this_turn", amount: 2 }, ctx, delta);
+  applyEffect({ type: "all_others_lose_gold", amount: 2 }, ctx, delta);
   assertEqual(delta.playerDelta("p2").goldChange, -2, "p2 loses 2");
   assertEqual(delta.playerDelta("p3").goldChange, 0, "p3 has 0, loses 0");
 });
@@ -228,10 +238,10 @@ test("Battle Standard: bonus applies when 2+ companions played", () => {
 
 console.log("\n=== FULL CARD RESOLUTION ===");
 
-test("Pickpocket: gain 2 gold AND all others lose 1 gold", () => {
+test("Pickpocket: gain 2 focus AND permanently steal 1 gold from others", () => {
   const effects: CardEffect[] = [
-    { type: "gain_gold", amount: 2 },
-    { type: "all_others_lose_gold_this_turn", amount: 1 },
+    { type: "gain_focus", amount: 2 },
+    { type: "all_others_lose_gold", amount: 1 },
   ];
   const ctx = makeCtx({
     otherPlayers: [
@@ -241,9 +251,9 @@ test("Pickpocket: gain 2 gold AND all others lose 1 gold", () => {
   });
   const delta = resolveCardPlay(effects, ctx);
 
-  assertEqual(delta.playerDelta("p1").goldChange, 2, "self +2");
-  assertEqual(delta.playerDelta("p2").goldChange, -1, "p2 -1");
-  assertEqual(delta.playerDelta("p3").goldChange, -1, "p3 -1");
+  assertEqual(delta.playerDelta("p1").focusChange, 2, "self +2 focus");
+  assertEqual(delta.playerDelta("p2").goldChange, -1, "p2 loses 1 gold");
+  assertEqual(delta.playerDelta("p3").goldChange, -1, "p3 loses 1 gold");
   assertEqual(delta.cardMovements.length, 1, "one card movement");
   assertEqual(delta.cardMovements[0]?.to, "player_discard", "non-one-time moves to discard");
 });

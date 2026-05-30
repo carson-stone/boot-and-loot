@@ -67,7 +67,8 @@ async function main() {
     name: string;
     cardType: CardType;
     pool: CardPool;
-    costGold: number;
+    costGold?: number;
+    costFocus?: number;
     isOneTimeUse?: boolean;
     triggersHorde?: boolean;
     isKillableThreat?: boolean;
@@ -85,31 +86,31 @@ async function main() {
 
   const cards: CardDef[] = [
     // ---- Starter ----
-    { name: "Copper Coin", cardType: "device", pool: "starter", costGold: 0, description: "A simple coin. Basic income.", totalQuantity: 6, effects: [{ displayOrder: 0, effectType: "gain_gold", amount: 1 }] },
+    { name: "Copper Coin", cardType: "device", pool: "starter", description: "A simple coin. Basic income.", totalQuantity: 6, effects: [{ displayOrder: 0, effectType: "gain_gold", amount: 1 }] },
     { name: "Walking Stick", cardType: "device", pool: "starter", costGold: 0, description: "Helps you cover ground.", totalQuantity: 3, effects: [{ displayOrder: 0, effectType: "gain_movement", amount: 1 }] },
     { name: "Rusty Dagger", cardType: "device", pool: "starter", costGold: 0, description: "Better than fists. Barely.", totalQuantity: 1, effects: [{ displayOrder: 0, effectType: "gain_attack", amount: 1 }] },
 
     // ---- Static market ----
-    { name: "Silver Coin", cardType: "device", pool: "static", costGold: 3, description: "A better coin.", totalQuantity: 10, effects: [{ displayOrder: 0, effectType: "gain_gold", amount: 2 }] },
-    { name: "Adventurer's Boots", cardType: "device", pool: "static", costGold: 4, description: "Speed when you need it.", totalQuantity: 10, effects: [{ displayOrder: 0, effectType: "gain_movement", amount: 2 }] },
-    { name: "Short Sword", cardType: "device", pool: "static", costGold: 4, description: "Real steel.", totalQuantity: 10, effects: [{ displayOrder: 0, effectType: "gain_attack", amount: 2 }] },
-    { name: "Hired Hand", cardType: "companion", pool: "static", costGold: 3, description: "A useful traveling friend.", totalQuantity: 10, effects: [{ displayOrder: 0, effectType: "gain_gold", amount: 1 }, { displayOrder: 1, effectType: "draw_cards", amount: 1 }] },
+    { name: "Silver Coin", cardType: "device", pool: "static", costFocus: 3, description: "A better coin. Builds toward real wealth.", totalQuantity: 10, effects: [{ displayOrder: 0, effectType: "gain_gold", amount: 2 }] },
+    { name: "Adventurer's Boots", cardType: "device", pool: "static", costFocus: 4, description: "Speed when you need it.", totalQuantity: 10, effects: [{ displayOrder: 0, effectType: "gain_movement", amount: 2 }] },
+    { name: "Short Sword", cardType: "device", pool: "static", costFocus: 4, description: "Real steel.", totalQuantity: 10, effects: [{ displayOrder: 0, effectType: "gain_attack", amount: 2 }] },
+    { name: "Hired Hand", cardType: "companion", pool: "static", costFocus: 3, description: "A useful traveling friend.", totalQuantity: 10, effects: [{ displayOrder: 0, effectType: "gain_focus", amount: 1 }, { displayOrder: 1, effectType: "draw_cards", amount: 1 }] },
 
     // ---- Dynamic: standard ----
-    { name: "Gold Pouch", cardType: "device", pool: "dynamic", costGold: 5, description: "A heavy purse.", totalQuantity: 4, effects: [{ displayOrder: 0, effectType: "gain_gold", amount: 3 }] },
-    { name: "Lantern Bearer", cardType: "companion", pool: "dynamic", costGold: 4, description: "Light and a stout arm.", totalQuantity: 3, effects: [{ displayOrder: 0, effectType: "gain_movement", amount: 1 }, { displayOrder: 1, effectType: "gain_attack", amount: 1 }] },
-    { name: "Veteran Mercenary", cardType: "companion", pool: "dynamic", costGold: 6, description: "Battle-tested. Worth the coin.", totalQuantity: 3, effects: [{ displayOrder: 0, effectType: "gain_gold", amount: 1 }, { displayOrder: 1, effectType: "gain_attack", amount: 2 }] },
-    { name: "Treasure Map", cardType: "device", pool: "dynamic", costGold: 5, description: "Points to riches. And card draws.", totalQuantity: 3, effects: [{ displayOrder: 0, effectType: "gain_movement", amount: 2 }, { displayOrder: 1, effectType: "draw_cards", amount: 1 }] },
-    { name: "Scout", cardType: "companion", pool: "dynamic", costGold: 3, description: "Sees what others miss.", totalQuantity: 3, effects: [{ displayOrder: 0, effectType: "draw_cards", amount: 2 }] },
-    { name: "War Drum", cardType: "device", pool: "dynamic", costGold: 4, description: "Loud. Effective. Loud.", totalQuantity: 3, effects: [{ displayOrder: 0, effectType: "gain_attack", amount: 1 }, { displayOrder: 1, effectType: "gain_attention", amount: 1 }] },
+    { name: "Gold Pouch", cardType: "device", pool: "dynamic", costFocus: 5, description: "A heavy purse.", totalQuantity: 4, effects: [{ displayOrder: 0, effectType: "gain_gold", amount: 3 }] },
+    { name: "Lantern Bearer", cardType: "companion", pool: "dynamic", costFocus: 4, description: "Light and a stout arm.", totalQuantity: 3, effects: [{ displayOrder: 0, effectType: "gain_movement", amount: 1 }, { displayOrder: 1, effectType: "gain_attack", amount: 1 }] },
+    { name: "Veteran Mercenary", cardType: "companion", pool: "dynamic", costFocus: 4, costGold: 2, description: "Battle-tested. Worth the coin — and some gold.", totalQuantity: 3, effects: [{ displayOrder: 0, effectType: "gain_gold", amount: 1 }, { displayOrder: 1, effectType: "gain_attack", amount: 2 }] },
+    { name: "Treasure Map", cardType: "device", pool: "dynamic", costFocus: 5, description: "Points to riches. And card draws.", totalQuantity: 3, effects: [{ displayOrder: 0, effectType: "gain_movement", amount: 2 }, { displayOrder: 1, effectType: "draw_cards", amount: 1 }] },
+    { name: "Scout", cardType: "companion", pool: "dynamic", costFocus: 3, description: "Sees what others miss.", totalQuantity: 3, effects: [{ displayOrder: 0, effectType: "draw_cards", amount: 2 }] },
+    { name: "War Drum", cardType: "device", pool: "dynamic", costFocus: 4, description: "Loud. Effective. Loud.", totalQuantity: 3, effects: [{ displayOrder: 0, effectType: "gain_attack", amount: 1 }, { displayOrder: 1, effectType: "gain_attention", amount: 1 }] },
     { name: "Cave Bat", cardType: "monster", pool: "dynamic", costGold: 0, isKillableThreat: true, description: "A shrieking swarm. Fast and disorienting.", totalQuantity: 3, resolutionOptions: [
       { label: "Fight", displayOrder: 0, costAttacks: 1, rewardGold: 2 },
     ]},
     { name: "Ogre Brute", cardType: "monster", pool: "dynamic", costGold: 0, isKillableThreat: true, description: "A wall of muscle and bad intentions.", totalQuantity: 2, resolutionOptions: [
       { label: "Fight", displayOrder: 0, costAttacks: 3, rewardGold: 4 },
     ]},
-    { name: "Bag of Loot", cardType: "device", pool: "dynamic", costGold: 5, description: "A heavy sack — coins and a quick step.", totalQuantity: 3, effects: [{ displayOrder: 0, effectType: "gain_gold", amount: 2 }, { displayOrder: 1, effectType: "gain_movement", amount: 1 }] },
-    { name: "Map Fragment", cardType: "device", pool: "dynamic", costGold: 3, description: "A torn corner of a larger map.", totalQuantity: 4, effects: [{ displayOrder: 0, effectType: "gain_movement", amount: 1 }, { displayOrder: 1, effectType: "draw_cards", amount: 1 }] },
+    { name: "Bag of Loot", cardType: "device", pool: "dynamic", costFocus: 5, description: "A heavy sack — coins and a quick step.", totalQuantity: 3, effects: [{ displayOrder: 0, effectType: "gain_gold", amount: 2 }, { displayOrder: 1, effectType: "gain_movement", amount: 1 }] },
+    { name: "Map Fragment", cardType: "device", pool: "dynamic", costFocus: 3, description: "A torn corner of a larger map.", totalQuantity: 4, effects: [{ displayOrder: 0, effectType: "gain_movement", amount: 1 }, { displayOrder: 1, effectType: "draw_cards", amount: 1 }] },
     { name: "Cultist", cardType: "monster", pool: "dynamic", costGold: 0, isKillableThreat: true, description: "A fanatic offering a deal. Fight or pay the price.", totalQuantity: 3, resolutionOptions: [
       { label: "Fight", displayOrder: 0, costAttacks: 2, rewardGold: 3, rewardReputation: 1 },
       { label: "Sacrifice", displayOrder: 1, costHealth: 2, rewardGold: 5, rewardReputation: 2 },
@@ -122,32 +123,32 @@ async function main() {
     { name: "Goblin Trickster", cardType: "monster", pool: "dynamic", costGold: 0, isKillableThreat: true, description: "Cackles as it dies. Defeating it is satisfying but loud.", totalQuantity: 3, resolutionOptions: [
       { label: "Fight", displayOrder: 0, costAttacks: 2, rewardGold: 3, rewardReputation: 1, rewardJson: { gain_attention: 1 } },
     ]},
-    { name: "Pickpocket", cardType: "companion", pool: "dynamic", costGold: 5, description: "Nimble fingers. Every other player loses 1 gold this turn.", totalQuantity: 3, effects: [{ displayOrder: 0, effectType: "gain_gold", amount: 2 }, { displayOrder: 1, effectType: "all_others_lose_gold_this_turn", amount: 1 }] },
+    { name: "Pickpocket", cardType: "companion", pool: "dynamic", costFocus: 5, description: "Nimble fingers. Gain focus and permanently lift a gold coin from every other player.", totalQuantity: 3, effects: [{ displayOrder: 0, effectType: "gain_focus", amount: 2 }, { displayOrder: 1, effectType: "all_others_lose_gold", amount: 1 }] },
 
     // ---- Dynamic: turn modifiers ----
-    { name: "Crystal Charm", cardType: "device", pool: "dynamic", costGold: 6, description: "Reduces all attention you generate this turn by 1.", totalQuantity: 2, effects: [{ displayOrder: 0, effectType: "reduce_attention_generated_this_turn", amount: 1 }] },
-    { name: "Iron Buckler", cardType: "device", pool: "dynamic", costGold: 5, description: "Bash and block. Prevents 1 damage this turn.", totalQuantity: 3, effects: [{ displayOrder: 0, effectType: "gain_attack", amount: 1 }, { displayOrder: 1, effectType: "prevent_damage_this_turn", amount: 1 }] },
-    { name: "Battle Standard", cardType: "device", pool: "dynamic", costGold: 5, description: "Rally your allies. If you play 2 or more companions this turn, gain +2 attack.", totalQuantity: 2, effects: [{ displayOrder: 0, effectType: "gain_attack", amount: 1 }, { displayOrder: 1, effectType: "conditional_gain_attack_if_card_type_played", amount: 0, parametersJson: { card_type: "companion", threshold: 2, bonus: 2 } }] },
-    { name: "Shadow Cloak", cardType: "device", pool: "dynamic", costGold: 7, isOneTimeUse: true, description: "One-time: all cards you play this turn generate 0 attention.", totalQuantity: 2, effects: [{ displayOrder: 0, effectType: "all_cards_zero_attention_this_turn", amount: 0 }] },
+    { name: "Crystal Charm", cardType: "device", pool: "dynamic", costFocus: 6, description: "Reduces all attention you generate this turn by 1.", totalQuantity: 2, effects: [{ displayOrder: 0, effectType: "reduce_attention_generated_this_turn", amount: 1 }] },
+    { name: "Iron Buckler", cardType: "device", pool: "dynamic", costFocus: 5, description: "Bash and block. Prevents 1 damage this turn.", totalQuantity: 3, effects: [{ displayOrder: 0, effectType: "gain_attack", amount: 1 }, { displayOrder: 1, effectType: "prevent_damage_this_turn", amount: 1 }] },
+    { name: "Battle Standard", cardType: "device", pool: "dynamic", costFocus: 5, description: "Rally your allies. If you play 2 or more companions this turn, gain +2 attack.", totalQuantity: 2, effects: [{ displayOrder: 0, effectType: "gain_attack", amount: 1 }, { displayOrder: 1, effectType: "conditional_gain_attack_if_card_type_played", amount: 0, parametersJson: { card_type: "companion", threshold: 2, bonus: 2 } }] },
+    { name: "Shadow Cloak", cardType: "device", pool: "dynamic", costFocus: 7, isOneTimeUse: true, description: "All cards you play this turn generate 0 attention.", totalQuantity: 2, effects: [{ displayOrder: 0, effectType: "all_cards_zero_attention_this_turn", amount: 0 }] },
 
     // ---- Dynamic: one-time-use ----
-    { name: "Sleight of Hand", cardType: "device", pool: "dynamic", costGold: 4, isOneTimeUse: true, description: "Slip away unnoticed. Remove 2 attention from your pool.", totalQuantity: 3, effects: [{ displayOrder: 0, effectType: "remove_attention", amount: 2 }] },
-    { name: "Smoke Bomb", cardType: "device", pool: "dynamic", costGold: 6, isOneTimeUse: true, description: "A puff of cover and a quick exit.", totalQuantity: 2, effects: [{ displayOrder: 0, effectType: "gain_movement", amount: 2 }, { displayOrder: 1, effectType: "remove_attention", amount: 3 }] },
-    { name: "Healing Draught", cardType: "device", pool: "dynamic", costGold: 4, isOneTimeUse: true, description: "One-time: heal 3 health.", totalQuantity: 3, effects: [{ displayOrder: 0, effectType: "heal", amount: 3 }] },
-    { name: "Decoy", cardType: "device", pool: "dynamic", costGold: 3, isOneTimeUse: true, description: "Convert 1 of your attention into Luck. It stays in the Fray but can no longer be traced back to you.", totalQuantity: 4, effects: [{ displayOrder: 0, effectType: "redirect_attention_to_filler", amount: 1 }] },
-    { name: "Apothecary", cardType: "companion", pool: "dynamic", costGold: 6, isOneTimeUse: true, description: "One-time: gain 1 gold and heal 2 health.", totalQuantity: 3, effects: [{ displayOrder: 0, effectType: "gain_gold", amount: 1 }, { displayOrder: 1, effectType: "heal", amount: 2 }] },
+    { name: "Sleight of Hand", cardType: "device", pool: "dynamic", costFocus: 4, isOneTimeUse: true, description: "Slip away unnoticed. Remove 2 attention from your pool.", totalQuantity: 3, effects: [{ displayOrder: 0, effectType: "remove_attention", amount: 2 }] },
+    { name: "Smoke Bomb", cardType: "device", pool: "dynamic", costFocus: 6, isOneTimeUse: true, description: "A puff of cover and a quick exit.", totalQuantity: 2, effects: [{ displayOrder: 0, effectType: "gain_movement", amount: 2 }, { displayOrder: 1, effectType: "remove_attention", amount: 3 }] },
+    { name: "Healing Draught", cardType: "device", pool: "dynamic", costFocus: 4, isOneTimeUse: true, description: "Heal 3 health.", totalQuantity: 3, effects: [{ displayOrder: 0, effectType: "heal", amount: 3 }] },
+    { name: "Decoy", cardType: "device", pool: "dynamic", costFocus: 3, isOneTimeUse: true, description: "Convert 1 of your attention into Luck. It stays in the Fray but can no longer be traced back to you.", totalQuantity: 4, effects: [{ displayOrder: 0, effectType: "redirect_attention_to_filler", amount: 1 }] },
+    { name: "Apothecary", cardType: "companion", pool: "dynamic", costFocus: 6, isOneTimeUse: true, description: "Gain 1 gold and heal 2 health.", totalQuantity: 3, effects: [{ displayOrder: 0, effectType: "gain_gold", amount: 1 }, { displayOrder: 1, effectType: "heal", amount: 2 }] },
 
     // ---- Dynamic: special ----
-    { name: "Wandering Merchant", cardType: "companion", pool: "dynamic", costGold: 6, description: "Brings the market wherever he goes.", totalQuantity: 2, effects: [{ displayOrder: 0, effectType: "gain_gold", amount: 1 }, { displayOrder: 1, effectType: "grant_market_access_this_turn", amount: 0 }] },
+    { name: "Wandering Merchant", cardType: "companion", pool: "dynamic", costFocus: 6, description: "Brings the market wherever he goes.", totalQuantity: 2, effects: [{ displayOrder: 0, effectType: "gain_focus", amount: 1 }, { displayOrder: 1, effectType: "grant_market_access_this_turn", amount: 0 }] },
 
     // ---- Dynamic: spells (single-use when played; go to discard on purchase) ----
-    { name: "Alchemy", cardType: "spell", pool: "dynamic", costGold: 6, description: "Transmute your deck. Upgrades up to 3 Copper Coins in your discard or play area to Silver Coins. If you have no coppers, upgrades one Silver Coin to a Gold Pouch.", totalQuantity: 2, effects: [{ displayOrder: 0, effectType: "scripted", amount: 0, parametersJson: { script_id: "alchemy" } }] },
-    { name: "Smelt", cardType: "spell", pool: "dynamic", costGold: 4, description: "Melt down your copper. Converts up to 3 Copper Coins from your discard or play area into gold — then discards them permanently.", totalQuantity: 3, effects: [{ displayOrder: 0, effectType: "scripted", amount: 0, parametersJson: { script_id: "smelt" } }] },
-    { name: "Arcane Surge", cardType: "spell", pool: "dynamic", costGold: 5, description: "A torrent of raw energy. Generates 4 gold this turn.", totalQuantity: 3, effects: [{ displayOrder: 0, effectType: "gain_gold", amount: 4 }] },
-    { name: "Blink", cardType: "spell", pool: "dynamic", costGold: 5, description: "Teleport yourself forward. Gain 3 movement this turn.", totalQuantity: 3, effects: [{ displayOrder: 0, effectType: "gain_movement", amount: 3 }] },
-    { name: "Mending", cardType: "spell", pool: "dynamic", costGold: 5, description: "Knit flesh and bone. Heal 5 health.", totalQuantity: 3, effects: [{ displayOrder: 0, effectType: "heal", amount: 5 }] },
-    { name: "Battle Cry", cardType: "spell", pool: "dynamic", costGold: 6, description: "A thunderous roar that steels your arm. Gain 4 attack this turn.", totalQuantity: 2, effects: [{ displayOrder: 0, effectType: "gain_attack", amount: 4 }] },
-    { name: "Veil", cardType: "spell", pool: "dynamic", costGold: 7, description: "Cloak yourself in silence. All cards generate 0 attention this turn, and remove 2 attention from your pool.", totalQuantity: 2, effects: [{ displayOrder: 0, effectType: "all_cards_zero_attention_this_turn", amount: 0 }, { displayOrder: 1, effectType: "remove_attention", amount: 2 }] },
+    { name: "Alchemy", cardType: "spell", pool: "dynamic", costFocus: 6, description: "Transmute your deck. Upgrades up to 3 Copper Coins in your discard or play area to Silver Coins. If you have no coppers, upgrades one Silver Coin to a Gold Pouch.", totalQuantity: 2, effects: [{ displayOrder: 0, effectType: "scripted", amount: 0, parametersJson: { script_id: "alchemy" } }] },
+    { name: "Smelt", cardType: "spell", pool: "dynamic", costFocus: 4, description: "Melt down your copper. Converts up to 3 Copper Coins from your discard or play area into gold — then discards them permanently.", totalQuantity: 3, effects: [{ displayOrder: 0, effectType: "scripted", amount: 0, parametersJson: { script_id: "smelt" } }] },
+    { name: "Arcane Surge", cardType: "spell", pool: "dynamic", costFocus: 5, description: "A torrent of raw Focus. Generates 4 Focus this turn.", totalQuantity: 3, effects: [{ displayOrder: 0, effectType: "gain_focus", amount: 4 }] },
+    { name: "Blink", cardType: "spell", pool: "dynamic", costFocus: 5, description: "Teleport yourself forward. Gain 3 movement this turn.", totalQuantity: 3, effects: [{ displayOrder: 0, effectType: "gain_movement", amount: 3 }] },
+    { name: "Mending", cardType: "spell", pool: "dynamic", costFocus: 5, description: "Knit flesh and bone. Heal 5 health.", totalQuantity: 3, effects: [{ displayOrder: 0, effectType: "heal", amount: 5 }] },
+    { name: "Battle Cry", cardType: "spell", pool: "dynamic", costFocus: 6, description: "A thunderous roar that steels your arm. Gain 4 attack this turn.", totalQuantity: 2, effects: [{ displayOrder: 0, effectType: "gain_attack", amount: 4 }] },
+    { name: "Veil", cardType: "spell", pool: "dynamic", costFocus: 7, description: "Cloak yourself in silence. All cards generate 0 attention this turn, and remove 2 attention from your pool.", totalQuantity: 2, effects: [{ displayOrder: 0, effectType: "all_cards_zero_attention_this_turn", amount: 0 }, { displayOrder: 1, effectType: "remove_attention", amount: 2 }] },
 
     // ---- Dynamic: killable threats ----
     { name: "Restless Horde", cardType: "monster", pool: "dynamic", costGold: 0, triggersHorde: true, isKillableThreat: true, description: "Hazard. Triggers a horde attack on reveal, then sits as a killable threat.", totalQuantity: 4, resolutionOptions: [
@@ -190,7 +191,8 @@ async function main() {
         name: card.name,
         cardType: card.cardType,
         pool: card.pool,
-        costGold: card.costGold,
+        costGold: card.costGold ?? 0,
+        costFocus: card.costFocus ?? 0,
         isOneTimeUse: card.isOneTimeUse ?? false,
         triggersHorde: card.triggersHorde ?? false,
         isKillableThreat: card.isKillableThreat ?? false,

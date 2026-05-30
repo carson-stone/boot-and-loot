@@ -14,9 +14,10 @@ export async function loadTurnState(turnId: string): Promise<TurnState> {
   const turn = await prisma.turn.findUniqueOrThrow({ where: { id: turnId } });
   const actions = (turn.actions ?? []) as ActionLogEntry[];
 
-  const resources: TurnResources = { gold: 0, movement: 0, attacks: 0, cardsToDraw: 0 };
+  const resources: TurnResources = { focus: 0, movement: 0, attacks: 0, cardsToDraw: 0 };
   const modifiers: TurnModifiers = {
     goldMultiplier: 1,
+    focusMultiplier: 1,
     attackMultiplier: 1,
     attentionGeneratedMultiplier: 1,
     attentionGeneratedReduction: 0,
@@ -24,10 +25,11 @@ export async function loadTurnState(turnId: string): Promise<TurnState> {
     marketAccessFromAnywhere: false,
   };
   const playCounts: PlayCounts = { monsters: 0, devices: 0, companions: 0 };
-  let goldGained = 0;
-  let goldSpent = 0;         // derived from action log (buy_card, buy_tool entries)
-  let movementUsed = 0;      // derived from action log (move entries)
-  const attacksUsed = turn.attacksUsed; // derived from DB — room combat isn't in the log
+  let focusGained = 0;
+  let focusSpent = 0;   // derived from buy_card (focus_paid) action log entries
+  let goldGained = 0;   // for retroactive gold multiplier
+  let movementUsed = 0;
+  const attacksUsed = turn.attacksUsed;
 
   for (const action of actions) {
     if (action.type === "effect_resolved") {
@@ -35,9 +37,14 @@ export async function loadTurnState(turnId: string): Promise<TurnState> {
       const effectType = action.effect_type;
 
       switch (effectType) {
+        case "gain_focus": {
+          const amount = (details.amount as number) * modifiers.focusMultiplier;
+          resources.focus += amount;
+          focusGained += amount;
+          break;
+        }
         case "gain_gold": {
           const amount = (details.amount as number) * modifiers.goldMultiplier;
-          resources.gold += amount;
           goldGained += amount;
           break;
         }
@@ -52,14 +59,17 @@ export async function loadTurnState(turnId: string): Promise<TurnState> {
         case "draw_cards":
           resources.cardsToDraw += details.amount as number;
           break;
-        case "multiply_gold_this_turn": {
+        case "multiply_focus_this_turn": {
           const factor = details.factor as number;
-          const oldGold = goldGained;
-          goldGained = oldGold * factor;
-          resources.gold = goldGained - goldSpent;
-          modifiers.goldMultiplier *= factor;
+          focusGained = focusGained * factor;
+          resources.focus = focusGained - focusSpent;
+          modifiers.focusMultiplier *= factor;
           break;
         }
+        case "multiply_gold_this_turn":
+          goldGained = goldGained * (details.factor as number);
+          modifiers.goldMultiplier *= details.factor as number;
+          break;
         case "multiply_attack_this_turn":
           modifiers.attackMultiplier *= details.factor as number;
           break;
@@ -78,14 +88,10 @@ export async function loadTurnState(turnId: string): Promise<TurnState> {
       }
     }
 
-    if (action.type === "play_card") {
-      // We need to look up card type to count plays — fetch it
-    }
-
-    if (action.type === "buy_card" || action.type === "buy_tool") {
-      const paid = (action as { gold_paid: number }).gold_paid;
-      goldSpent += paid;
-      resources.gold -= paid;
+    if (action.type === "buy_card") {
+      const paid = (action as { focus_paid?: number; gold_paid?: number }).focus_paid ?? 0;
+      focusSpent += paid;
+      resources.focus -= paid;
     }
 
     if (action.type === "move") {
@@ -95,7 +101,7 @@ export async function loadTurnState(turnId: string): Promise<TurnState> {
     }
   }
 
-  // Count play types from cards in play area
+  // Count play types from cards played this turn
   const playAreaCards = await prisma.gameCard.findMany({
     where: {
       gameId: turn.gameId,
@@ -105,7 +111,6 @@ export async function loadTurnState(turnId: string): Promise<TurnState> {
     include: { cardDefinition: true },
   });
 
-  // Count cards played this turn by looking at play_card actions
   const playedCardIds = actions
     .filter((a): a is { type: "play_card"; game_card_id: string; card_name: string } => a.type === "play_card")
     .map((a) => a.game_card_id);
@@ -123,8 +128,9 @@ export async function loadTurnState(turnId: string): Promise<TurnState> {
     resources,
     modifiers,
     playCounts,
+    focusGainedThisTurn: focusGained,
+    focusSpentThisTurn: focusSpent,
     goldGainedThisTurn: goldGained,
-    goldSpentThisTurn: goldSpent,
     movementUsedThisTurn: movementUsed,
     attacksUsedThisTurn: attacksUsed,
   };
@@ -151,8 +157,10 @@ export async function buildPlayContext(
     id: player.id,
     health: player.currentHealth,
     maxHealth: player.maxHealth,
-    gold: player.gold + turnState.resources.gold - turnState.goldSpentThisTurn,
+    gold: player.gold,
     goldGainedThisTurn: turnState.goldGainedThisTurn,
+    focus: player.focus,
+    focusGainedThisTurn: turnState.focusGainedThisTurn,
     attention: player.attentionPoints,
     isDead: player.isDead,
     hasExited: player.hasExited,
@@ -164,6 +172,8 @@ export async function buildPlayContext(
     maxHealth: p.maxHealth,
     gold: p.gold,
     goldGainedThisTurn: 0,
+    focus: p.focus,
+    focusGainedThisTurn: 0,
     attention: p.attentionPoints,
     isDead: p.isDead,
     hasExited: p.hasExited,
@@ -245,6 +255,7 @@ export async function loadGameState(gameId: string, requestingPlayerId?: string)
         name: def.name,
         cardType: def.cardType,
         costGold: def.costGold,
+        costFocus: def.costFocus,
         description: def.description,
         available,
         effects: def.effects.map((e) => ({
@@ -273,6 +284,7 @@ export async function loadGameState(gameId: string, requestingPlayerId?: string)
       name: c.cardDefinition.name,
       cardType: c.cardDefinition.cardType,
       costGold: c.cardDefinition.costGold,
+      costFocus: c.cardDefinition.costFocus,
       isOneTimeUse: c.cardDefinition.isOneTimeUse,
       description: c.cardDefinition.description,
       effects: c.cardDefinition.effects.map((e) => ({
@@ -310,6 +322,7 @@ export async function loadGameState(gameId: string, requestingPlayerId?: string)
         include: { cardDefinition: { include: { effects: { orderBy: { displayOrder: "asc" } } } } },
       });
       myStats = {
+        focusRemaining: turnState.resources.focus,
         movementRemaining: turnState.resources.movement,
         attacksRemaining: turnState.resources.attacks - turnState.attacksUsedThisTurn,
         deckCount,
@@ -319,6 +332,7 @@ export async function loadGameState(gameId: string, requestingPlayerId?: string)
           name: c.cardDefinition.name,
           cardType: c.cardDefinition.cardType,
           costGold: c.cardDefinition.costGold,
+          costFocus: c.cardDefinition.costFocus,
           isOneTimeUse: c.cardDefinition.isOneTimeUse,
           description: c.cardDefinition.description,
           effects: c.cardDefinition.effects.map((e) => ({
@@ -409,6 +423,7 @@ export async function loadGameState(gameId: string, requestingPlayerId?: string)
       name: c.cardDefinition.name,
       cardType: c.cardDefinition.cardType,
       costGold: c.cardDefinition.costGold,
+      costFocus: c.cardDefinition.costFocus,
       isOneTimeUse: c.cardDefinition.isOneTimeUse,
       isKillableThreat: c.cardDefinition.isKillableThreat,
       description: c.cardDefinition.description,

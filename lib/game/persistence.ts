@@ -14,11 +14,13 @@ export async function applyStateDelta(
     const player = await tx.player.findUniqueOrThrow({ where: { id: pid } });
     const newHealth = Math.max(0, Math.min(player.maxHealth, player.currentHealth + changes.healthChange));
     const newGold = Math.max(0, player.gold + changes.goldChange);
+    const newFocus = Math.max(0, player.focus + changes.focusChange);
     const newAttention = Math.max(0, player.attentionPoints + changes.attentionChange);
 
     const updateData: Record<string, unknown> = {
       currentHealth: newHealth,
       gold: newGold,
+      focus: newFocus,
       attentionPoints: newAttention,
     };
 
@@ -61,17 +63,9 @@ export async function applyStateDelta(
   const existingActions = (turn.actions ?? []) as ActionLogEntry[];
   const updatedActions = [...existingActions, ...delta.actionLogEntries];
 
-  // Update turn resource tracking
-  const goldChange = delta.turnResourceChanges.gold ?? 0;
-  const movementChange = delta.turnResourceChanges.movement ?? 0;
-  const attacksChange = delta.turnResourceChanges.attacks ?? 0;
-
   await tx.turn.update({
     where: { id: turnId },
-    data: {
-      actions: updatedActions as never,
-      goldEarned: { increment: Math.max(0, goldChange) },
-    },
+    data: { actions: updatedActions as never },
   });
 
   // 4. Handle card draws

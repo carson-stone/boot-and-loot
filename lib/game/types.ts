@@ -5,8 +5,9 @@ export interface TurnState {
   resources: TurnResources;
   modifiers: TurnModifiers;
   playCounts: { monsters: number; devices: number; companions: number };
-  goldGainedThisTurn: number;
-  goldSpentThisTurn: number;
+  focusGainedThisTurn: number;  // gross focus earned (for retroactive multiplier)
+  focusSpentThisTurn: number;   // focus spent on purchases (reconstructed from log)
+  goldGainedThisTurn: number;   // gross gold earned (for retroactive multiplier)
   movementUsedThisTurn: number;
   attacksUsedThisTurn: number;
 }
@@ -30,6 +31,7 @@ export interface GameView {
 }
 
 export interface MyTurnStats {
+  focusRemaining: number;
   movementRemaining: number;
   attacksRemaining: number;
   deckCount: number;
@@ -89,6 +91,7 @@ export interface MarketCardView {
   name: string;
   cardType: string;
   costGold: number;
+  costFocus: number;
   isOneTimeUse: boolean;
   isKillableThreat: boolean;
   description: string | null;
@@ -102,6 +105,7 @@ export interface StaticMarketView {
   name: string;
   cardType: string;
   costGold: number;
+  costFocus: number;
   description: string | null;
   available: number;
   effects: EffectView[];
@@ -113,6 +117,7 @@ export interface HandCardView {
   name: string;
   cardType: string;
   costGold: number;
+  costFocus: number;
   isOneTimeUse: boolean;
   description: string | null;
   effects: EffectView[];

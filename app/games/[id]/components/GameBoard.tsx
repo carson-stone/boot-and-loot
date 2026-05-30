@@ -162,6 +162,7 @@ export function GameBoard({ gameId, state, playerId, onPlayerSelect, onUpdate }:
           standardCards={state.staticMarket}
           isMyTurn={isMyTurn}
           myGold={me.gold}
+          myFocus={isMyTurn ? (state.myStats?.focusRemaining ?? 0) : 0}
           myRoomIsMarket={state.map.rooms.find((r) => r.id === me.currentRoomId)?.isMarket ?? false}
           myTools={me.tools}
           onBuyCard={(p) => callApi("/buy-card", { playerId, ...p })}

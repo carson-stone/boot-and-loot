@@ -27,13 +27,12 @@ export async function resolveThreat(
 
   // Validate costs
   const availableAttacks = turnState.resources.attacks - turnState.attacksUsedThisTurn;
-  const availableGold = turnState.goldGainedThisTurn - turnState.goldSpentThisTurn;
 
   if (option.costAttacks > availableAttacks) {
     throw new GameError(`Not enough attacks: need ${option.costAttacks}, have ${availableAttacks}`, "NOT_ENOUGH_ATTACKS");
   }
-  if (option.costGold > availableGold) {
-    throw new GameError(`Not enough gold: need ${option.costGold}, have ${availableGold}`, "NOT_ENOUGH_GOLD");
+  if (option.costGold > player.gold) {
+    throw new GameError(`Not enough gold: need ${option.costGold}, have ${player.gold}`, "NOT_ENOUGH_GOLD");
   }
   if (option.costAttention > player.attentionPoints) {
     throw new GameError(`Not enough attention: need ${option.costAttention}, have ${player.attentionPoints}`, "NOT_ENOUGH_ATTENTION");
@@ -73,8 +72,10 @@ export async function resolveThreat(
     if (option.costAttention > 0) {
       playerUpdate.attentionPoints = { decrement: option.costAttention };
     }
-    if (option.rewardGold > 0) {
-      playerUpdate.gold = { increment: option.rewardGold };
+    // Gold: award reward and deduct cost as a single net change (gold is now persistent)
+    const netGold = option.rewardGold - option.costGold;
+    if (netGold !== 0) {
+      playerUpdate.gold = netGold > 0 ? { increment: netGold } : { decrement: -netGold };
     }
 
     if (Object.keys(playerUpdate).length > 0) {

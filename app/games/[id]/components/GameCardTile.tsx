@@ -30,7 +30,8 @@ function effectLabel(e: EffectView): string {
   const type = e.effectType;
   const n = e.amount;
   switch (type) {
-    case "gain_gold":                            return `💰 +${n}`;
+    case "gain_gold":                            return `💰 +${n} gold`;
+    case "gain_focus":                           return `🔵 +${n} focus`;
     case "gain_movement":                        return `👟 +${n}`;
     case "gain_attack":                          return `⚔️ +${n}`;
     case "gain_attention":                       return `👁 +${n}`;
@@ -39,8 +40,9 @@ function effectLabel(e: EffectView): string {
     case "remove_attention":                     return `👁 −${n}`;
     case "redirect_attention_to_filler":         return `👁 convert ${n} to Luck in the Fray`;
     case "all_others_gain_attention":            return `👁 others +${n}`;
-    case "all_others_lose_gold_this_turn":       return `💰 others −${n}`;
+    case "all_others_lose_gold":                 return `💰 steal ${n} gold from each`;
     case "multiply_gold_this_turn":              return `💰 ×${n} this turn`;
+    case "multiply_focus_this_turn":             return `🔵 ×${n} this turn`;
     case "multiply_attack_this_turn":            return `⚔️ ×${n} this turn`;
     case "reduce_attention_generated_this_turn": return `👁 −${n} generated`;
     case "all_cards_zero_attention_this_turn":   return `👁 0 this turn`;

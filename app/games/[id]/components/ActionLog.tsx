@@ -124,7 +124,8 @@ function formatEffect(d: Record<string, unknown>): string {
   const amt = (details?.amount ?? amount ?? 0) as number;
 
   switch (type) {
-    case "gain_gold":               return `+${amt} gold`;
+    case "gain_gold":               return `💰 +${amt} gold`;
+    case "gain_focus":              return `🔵 +${amt} focus`;
     case "gain_movement":           return `+${amt} movement`;
     case "gain_attack":             return `+${amt} attack`;
     case "gain_attention":          return `+${amt} attention`;
@@ -133,8 +134,9 @@ function formatEffect(d: Record<string, unknown>): string {
     case "remove_attention":        return `-${amt} attention`;
     case "redirect_attention_to_filler": return `converted ${amt} attention to Luck in the Fray`;
     case "all_others_gain_attention": return `all others +${amt} attention`;
-    case "all_others_lose_gold_this_turn": return `all others −${amt} gold this turn`;
-    case "multiply_gold_this_turn": return `gold ×${(details?.factor ?? amount) as number} this turn`;
+    case "all_others_lose_gold":    return `steal ${amt} gold from each player`;
+    case "multiply_gold_this_turn": return `💰 gold ×${(details?.factor ?? amount) as number} this turn`;
+    case "multiply_focus_this_turn": return `🔵 focus ×${(details?.factor ?? amount) as number} this turn`;
     case "multiply_attack_this_turn": return `attacks ×${(details?.factor ?? amount) as number} this turn`;
     case "reduce_attention_generated_this_turn": return `attention generated −${amt} this turn`;
     case "all_cards_zero_attention_this_turn": return `0 attention generated this turn`;

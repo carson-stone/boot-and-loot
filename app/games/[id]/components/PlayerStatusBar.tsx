@@ -69,6 +69,7 @@ export function PlayerStatusBar({ players, currentTurnPlayerId, turnNumber, myPl
         {/* Current player's turn stats */}
         {myStats && (
           <div className="mt-3 pt-3 border-t border-slate-200 flex flex-wrap gap-3 text-xs text-slate-700">
+            <span>🔵 <strong className="text-slate-900">{myStats.focusRemaining}</strong> focus</span>
             <span>⚡ <strong className="text-slate-900">{myStats.movementRemaining}</strong> movement</span>
             <span>⚔ <strong className="text-slate-900">{myStats.attacksRemaining}</strong> attacks</span>
             <span>🂠 <strong className="text-slate-900">{myStats.deckCount}</strong> in deck</span>

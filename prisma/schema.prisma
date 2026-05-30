@@ -156,6 +156,7 @@ model CardDefinition {
   cardType        CardType @map("card_type")
   pool            CardPool
   costGold        Int      @default(0) @map("cost_gold")
+  costFocus       Int      @default(0) @map("cost_focus")
   isOneTimeUse    Boolean  @default(false) @map("is_one_time_use")
   triggersHorde   Boolean  @default(false) @map("triggers_horde")
   isKillableThreat Boolean @default(false) @map("is_killable_threat")
@@ -253,6 +254,7 @@ model Player {
   maxHealth        Int       @default(10) @map("max_health")
   currentHealth    Int       @default(10) @map("current_health")
   gold             Int       @default(0)
+  focus            Int       @default(0)
   attentionPoints  Int       @default(0) @map("attention_points")
   artifactCapacity Int       @default(1) @map("artifact_capacity")
   hasExited        Boolean   @default(false) @map("has_exited")

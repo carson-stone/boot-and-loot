@@ -20,6 +20,7 @@
 export type CardEffect =
   // ---- Instant additive (player's own resources) ----
   | { type: "gain_gold";       amount: number }
+  | { type: "gain_focus";      amount: number }
   | { type: "gain_movement";   amount: number }
   | { type: "gain_attack";     amount: number }
   | { type: "gain_attention";  amount: number }
@@ -32,10 +33,11 @@ export type CardEffect =
 
   // ---- Broad (other players) ----
   | { type: "all_others_gain_attention";     amount: number }
-  | { type: "all_others_lose_gold_this_turn"; amount: number }
+  | { type: "all_others_lose_gold";          amount: number }
 
   // ---- Turn modifiers (apply for the remainder of the current turn) ----
   | { type: "multiply_gold_this_turn";       factor: number }
+  | { type: "multiply_focus_this_turn";      factor: number }
   | { type: "multiply_attack_this_turn";     factor: number }
   | { type: "reduce_attention_generated_this_turn"; amount: number }
   | { type: "all_cards_zero_attention_this_turn" }
@@ -60,8 +62,10 @@ export interface PlayerView {
   id: string;
   health: number;
   maxHealth: number;
-  gold: number;
-  goldGainedThisTurn: number;
+  gold: number;             // persistent across turns
+  goldGainedThisTurn: number; // for retroactive gold multiplier
+  focus: number;            // ephemeral, resets each turn
+  focusGainedThisTurn: number; // for retroactive focus multiplier
   attention: number;
   isDead: boolean;
   hasExited: boolean;
@@ -70,6 +74,7 @@ export interface PlayerView {
 /** Turn-scoped modifiers that affect how primitives compute values. */
 export interface TurnModifiers {
   goldMultiplier: number;                  // default 1
+  focusMultiplier: number;                 // default 1
   attackMultiplier: number;                // default 1
   attentionGeneratedMultiplier: number;    // default 1 (Shadow Cloak sets to 0)
   attentionGeneratedReduction: number;     // default 0 (Crystal Charm raises by 1)
@@ -79,6 +84,7 @@ export interface TurnModifiers {
 
 export const DEFAULT_TURN_MODIFIERS: TurnModifiers = {
   goldMultiplier: 1,
+  focusMultiplier: 1,
   attackMultiplier: 1,
   attentionGeneratedMultiplier: 1,
   attentionGeneratedReduction: 0,
@@ -95,7 +101,7 @@ export interface PlayCounts {
 
 /** Resources accumulated during the current turn. */
 export interface TurnResources {
-  gold: number;
+  focus: number;        // ephemeral; resets at turn end
   movement: number;
   attacks: number;
   cardsToDraw: number;  // cards queued to be drawn after current effect resolves
@@ -141,6 +147,7 @@ export type CardLocation =
 export interface PlayerDelta {
   playerId: string;
   goldChange: number;
+  focusChange: number;
   healthChange: number;
   attentionChange: number;
 }
@@ -175,7 +182,7 @@ export class StateDelta {
   playerDelta(playerId: string): PlayerDelta {
     let d = this.playerChanges.get(playerId);
     if (!d) {
-      d = { playerId, goldChange: 0, healthChange: 0, attentionChange: 0 };
+      d = { playerId, goldChange: 0, focusChange: 0, healthChange: 0, attentionChange: 0 };
       this.playerChanges.set(playerId, d);
     }
     return d;
@@ -187,7 +194,7 @@ export type ActionLogEntry =
   | { type: "effect_resolved"; effect_type: string; details: Record<string, unknown> }
   | { type: "play_card"; game_card_id: string; card_name: string }
   | { type: "move"; from_room_id: string; to_room_id: string; from_room_name: string; to_room_name: string; movement_cost: number; damage_taken?: number }
-  | { type: "buy_card"; game_card_id: string; card_name: string; from: "static" | "dynamic"; gold_paid: number }
+  | { type: "buy_card"; game_card_id: string; card_name: string; from: "static" | "dynamic"; focus_paid: number; gold_paid: number }
   | { type: "buy_tool"; tool_code: string; tool_name: string; gold_paid: number }
   | { type: "pickup_artifact"; game_artifact_id: string; artifact_name: string }
   | { type: "defeat_threat"; game_card_id: string; threat_name: string; resolution_option_id: string; label: string }
@@ -224,7 +231,6 @@ export const SCRIPT_REGISTRY: Record<string, CardScript> = {
     const goldGained = coppers.length * ctx.modifiers.goldMultiplier;
     const self = delta.playerDelta(ctx.currentPlayer.id);
     self.goldChange += goldGained;
-    delta.turnResourceChanges.gold = (delta.turnResourceChanges.gold ?? 0) + goldGained;
     for (const card of coppers) {
       delta.cardMovements.push({ cardInstanceId: card.gameCardId, from: "player_discard", to: "trashed" });
     }
@@ -256,8 +262,14 @@ export function applyEffect(
     case "gain_gold": {
       const amount = effect.amount * ctx.modifiers.goldMultiplier;
       self.goldChange += amount;
-      delta.turnResourceChanges.gold =
-        (delta.turnResourceChanges.gold ?? 0) + amount;
+      return;
+    }
+
+    case "gain_focus": {
+      const amount = effect.amount * ctx.modifiers.focusMultiplier;
+      self.focusChange += amount;
+      delta.turnResourceChanges.focus =
+        (delta.turnResourceChanges.focus ?? 0) + amount;
       return;
     }
 
@@ -319,7 +331,7 @@ export function applyEffect(
       return;
     }
 
-    case "all_others_lose_gold_this_turn": {
+    case "all_others_lose_gold": {
       for (const other of ctx.otherPlayers) {
         const lost = Math.min(other.gold, effect.amount);
         delta.playerDelta(other.id).goldChange -= lost;
@@ -334,9 +346,19 @@ export function applyEffect(
       const extraOnExisting =
         ctx.currentPlayer.goldGainedThisTurn * (newMult - oldMult) / oldMult;
       self.goldChange += extraOnExisting;
-      delta.turnResourceChanges.gold =
-        (delta.turnResourceChanges.gold ?? 0) + extraOnExisting;
       delta.turnModifierChanges.goldMultiplier = newMult;
+      return;
+    }
+
+    case "multiply_focus_this_turn": {
+      const oldMult = ctx.modifiers.focusMultiplier;
+      const newMult = oldMult * effect.factor;
+      const extraOnExisting =
+        ctx.currentPlayer.focusGainedThisTurn * (newMult - oldMult) / oldMult;
+      self.focusChange += extraOnExisting;
+      delta.turnResourceChanges.focus =
+        (delta.turnResourceChanges.focus ?? 0) + extraOnExisting;
+      delta.turnModifierChanges.focusMultiplier = newMult;
       return;
     }
 
@@ -467,6 +489,7 @@ function rowToEffect(row: CardEffectRow): CardEffect {
   const { effect_type, amount, parameters_json } = row;
   switch (effect_type) {
     case "gain_gold":
+    case "gain_focus":
     case "gain_movement":
     case "gain_attack":
     case "gain_attention":
@@ -475,12 +498,13 @@ function rowToEffect(row: CardEffectRow): CardEffect {
     case "remove_attention":
     case "redirect_attention_to_filler":
     case "all_others_gain_attention":
-    case "all_others_lose_gold_this_turn":
+    case "all_others_lose_gold":
     case "reduce_attention_generated_this_turn":
     case "prevent_damage_this_turn":
       return { type: effect_type, amount } as CardEffect;
 
     case "multiply_gold_this_turn":
+    case "multiply_focus_this_turn":
     case "multiply_attack_this_turn":
       return { type: effect_type, factor: amount } as CardEffect;
 
