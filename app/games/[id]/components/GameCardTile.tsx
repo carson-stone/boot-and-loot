@@ -58,6 +58,7 @@ const TYPE_COLORS: Record<string, string> = {
   monster:   "bg-red-100 text-red-800",
   device:    "bg-blue-100 text-blue-800",
   companion: "bg-green-100 text-green-800",
+  spell:     "bg-purple-100 text-purple-800",
 };
 
 export function GameCardTile({ card, action }: GameCardTileProps) {

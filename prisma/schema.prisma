@@ -15,6 +15,7 @@ enum CardType {
   monster
   device
   companion
+  spell
 }
 
 enum CardPool {

@@ -111,7 +111,7 @@ export interface PlayContext {
   cardInstanceId: string;            // the game_cards.id being played
   cardName: string;                  // human-readable name for action log
   cardIsOneTimeUse: boolean;         // from card_definitions.is_one_time_use
-  cardType: "monster" | "device" | "companion";
+  cardType: "monster" | "device" | "companion" | "spell";
 }
 
 
@@ -391,7 +391,7 @@ export function resolveCardPlay(
   delta.cardMovements.push({
     cardInstanceId: ctx.cardInstanceId,
     from: "player_play_area",
-    to: ctx.cardIsOneTimeUse ? "trashed" : "player_discard",
+    to: ctx.cardIsOneTimeUse || ctx.cardType === "spell" ? "trashed" : "player_discard",
   });
 
   return delta;

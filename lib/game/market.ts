@@ -38,7 +38,8 @@ export async function buyCard(
   const def = gameCard.cardDefinition;
   // One-time-use items fire immediately on purchase and skip the deck entirely.
   // Exception: spells (once added as a card type) go to discard — they require deck preparation.
-  const immediateUse = def.isOneTimeUse;
+  // Spells go to discard on purchase (prepared in the deck, cast once when drawn).
+  const immediateUse = def.isOneTimeUse && def.cardType !== "spell";
 
   if (immediateUse) {
     // Build context and resolve effects before the transaction (pure reads + pure function).

@@ -140,6 +140,13 @@ async function main() {
     // ---- Dynamic: special ----
     { name: "Wandering Merchant", cardType: "companion", pool: "dynamic", costGold: 6, description: "Brings the market wherever he goes.", totalQuantity: 2, effects: [{ displayOrder: 0, effectType: "gain_gold", amount: 1 }, { displayOrder: 1, effectType: "grant_market_access_this_turn", amount: 0 }] },
 
+    // ---- Dynamic: spells (single-use when played; go to discard on purchase) ----
+    { name: "Arcane Surge", cardType: "spell", pool: "dynamic", costGold: 5, description: "A torrent of raw energy. Generates 4 gold this turn.", totalQuantity: 3, effects: [{ displayOrder: 0, effectType: "gain_gold", amount: 4 }] },
+    { name: "Blink", cardType: "spell", pool: "dynamic", costGold: 5, description: "Teleport yourself forward. Gain 3 movement this turn.", totalQuantity: 3, effects: [{ displayOrder: 0, effectType: "gain_movement", amount: 3 }] },
+    { name: "Mending", cardType: "spell", pool: "dynamic", costGold: 5, description: "Knit flesh and bone. Heal 5 health.", totalQuantity: 3, effects: [{ displayOrder: 0, effectType: "heal", amount: 5 }] },
+    { name: "Battle Cry", cardType: "spell", pool: "dynamic", costGold: 6, description: "A thunderous roar that steels your arm. Gain 4 attack this turn.", totalQuantity: 2, effects: [{ displayOrder: 0, effectType: "gain_attack", amount: 4 }] },
+    { name: "Veil", cardType: "spell", pool: "dynamic", costGold: 7, description: "Cloak yourself in silence. All cards generate 0 attention this turn, and remove 2 attention from your pool.", totalQuantity: 2, effects: [{ displayOrder: 0, effectType: "all_cards_zero_attention_this_turn", amount: 0 }, { displayOrder: 1, effectType: "remove_attention", amount: 2 }] },
+
     // ---- Dynamic: killable threats ----
     { name: "Restless Horde", cardType: "monster", pool: "dynamic", costGold: 0, triggersHorde: true, isKillableThreat: true, description: "Hazard. Triggers a horde attack on reveal, then sits as a killable threat.", totalQuantity: 4, resolutionOptions: [
       { label: "Fight", displayOrder: 0, costAttacks: 3, rewardGold: 4 },
