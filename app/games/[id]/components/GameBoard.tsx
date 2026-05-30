@@ -113,14 +113,12 @@ export function GameBoard({ gameId, state, playerId, onPlayerSelect, onUpdate }:
           </div>
         )}
 
+        {/* Map row: action log + map side by side */}
         <div className="grid grid-cols-12 gap-4">
-          {/* Left: Action log */}
           <div className="col-span-3">
             <ActionLog log={state.actionLog} />
           </div>
-
-          {/* Center: Map */}
-          <div className="col-span-6 space-y-4">
+          <div className="col-span-9 space-y-3">
             <MapView
               map={state.map}
               players={state.players}
@@ -131,31 +129,27 @@ export function GameBoard({ gameId, state, playerId, onPlayerSelect, onUpdate }:
               onEscape={() => callApi("/escape", { playerId })}
             />
             {isMyTurn && (
-              <div className="flex gap-2">
-                <Button onClick={() => callApi("/end-turn", { playerId })} variant="default">
-                  End Turn
-                </Button>
-              </div>
+              <Button onClick={() => callApi("/end-turn", { playerId })} variant="default">
+                End Turn
+              </Button>
             )}
-          </div>
-
-          {/* Right: Market */}
-          <div className="col-span-3">
-            <MarketPanel
-              dynamicMarket={state.dynamicMarket}
-              staticMarket={state.staticMarket}
-              isMyTurn={isMyTurn}
-              myGold={me.gold}
-              myRoomIsMarket={state.map.rooms.find((r) => r.id === me.currentRoomId)?.isMarket ?? false}
-              myTools={me.tools}
-              onBuyCard={(p) => callApi("/buy-card", { playerId, ...p })}
-              onBuyTool={(toolCode) => callApi("/buy-tool", { playerId, toolCode })}
-              onResolveThreat={(card) => setThreatTarget({ gameCardId: card.gameCardId, name: card.name })}
-            />
           </div>
         </div>
 
-        {/* Bottom: Hand */}
+        {/* Market row: full width, three sections side by side */}
+        <MarketPanel
+          dynamicMarket={state.dynamicMarket}
+          staticMarket={state.staticMarket}
+          isMyTurn={isMyTurn}
+          myGold={me.gold}
+          myRoomIsMarket={state.map.rooms.find((r) => r.id === me.currentRoomId)?.isMarket ?? false}
+          myTools={me.tools}
+          onBuyCard={(p) => callApi("/buy-card", { playerId, ...p })}
+          onBuyTool={(toolCode) => callApi("/buy-tool", { playerId, toolCode })}
+          onResolveThreat={(card) => setThreatTarget({ gameCardId: card.gameCardId, name: card.name })}
+        />
+
+        {/* Hand: full width */}
         <HandDisplay
           hand={state.myHand ?? []}
           isMyTurn={isMyTurn}
