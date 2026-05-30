@@ -35,7 +35,7 @@ export function HoverHand({ hand, isMyTurn, onPlay }: Props) {
               className={`text-[10px] px-1.5 py-0.5 rounded border transition-colors ${
                 pinned
                   ? "border-amber-500 text-amber-300 bg-amber-900/40"
-                  : "border-stone-600 text-stone-500 hover:text-stone-300"
+                  : "border-stone-600 text-stone-300 hover:text-stone-300"
               }`}
               title={pinned ? "Unpin hand" : "Pin hand open"}
             >
@@ -44,7 +44,7 @@ export function HoverHand({ hand, isMyTurn, onPlay }: Props) {
           </div>
 
           {hand.length === 0 ? (
-            <p className="text-stone-500 text-xs px-1 italic">Empty hand</p>
+            <p className="text-stone-300 text-xs px-1 italic">Empty hand</p>
           ) : (
             hand.map((card) => (
               <div key={card.gameCardId} className="shrink-0">

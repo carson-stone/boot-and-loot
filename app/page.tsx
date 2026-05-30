@@ -53,7 +53,7 @@ export default function Home() {
     } catch (e) { setError((e as Error).message); } finally { setJoining(false); }
   }
 
-  const inputCls = "w-full bg-stone-800 border border-stone-600 rounded px-3 py-2 text-sm text-stone-200 placeholder:text-stone-500 focus:outline-none focus:border-amber-600";
+  const inputCls = "w-full bg-stone-800 border border-stone-600 rounded px-3 py-2 text-sm text-stone-200 placeholder:text-stone-300 focus:outline-none focus:border-amber-600";
   const panelCls = "bg-stone-800 border border-stone-700 rounded-xl p-6 space-y-4";
 
   return (
@@ -73,7 +73,7 @@ export default function Home() {
         <button
           onClick={handleQuickTest}
           disabled={testing}
-          className="w-full border border-dashed border-stone-600 rounded-lg py-3 text-sm text-stone-500 hover:border-amber-700 hover:text-amber-500 transition-colors"
+          className="w-full border border-dashed border-stone-600 rounded-lg py-3 text-sm text-stone-300 hover:border-amber-700 hover:text-amber-500 transition-colors"
         >
           {testing ? "Setting up…" : "⚡ Quick Test — 2-player game, join as Player 1"}
         </button>

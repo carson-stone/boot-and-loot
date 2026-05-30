@@ -89,7 +89,7 @@ export function TurnRecap({ log, currentTurnNumber, currentTurnPlayerId }: Props
         <div className="px-3 pb-3 space-y-1">
           {lines.map((line, i) => (
             <div key={i} className="text-xs text-stone-300 flex gap-2">
-              <span className="text-stone-600 shrink-0">›</span>
+              <span className="text-stone-400 shrink-0">›</span>
               <span>{line}</span>
             </div>
           ))}

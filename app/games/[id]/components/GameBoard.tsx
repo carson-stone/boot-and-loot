@@ -174,7 +174,7 @@ export function GameBoard({ gameId, state, playerId, onPlayerSelect, onUpdate }:
         <div>
           <button
             onClick={() => setShowLog(!showLog)}
-            className="text-xs text-stone-600 hover:text-stone-400 transition-colors"
+            className="text-xs text-stone-400 hover:text-stone-400 transition-colors"
           >
             {showLog ? "▲ Hide" : "▼ Show"} action log
           </button>

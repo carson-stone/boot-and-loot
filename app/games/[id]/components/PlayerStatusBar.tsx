@@ -25,7 +25,7 @@ export function PlayerStatusBar({ players, currentTurnPlayerId, turnNumber, myPl
       <div className="bg-stone-900 border border-stone-700 rounded-lg p-3">
         <div className="flex items-center justify-between mb-2">
           <h2 className="font-display text-xs text-amber-400 tracking-widest uppercase">Adventurers</h2>
-          {turnNumber && <span className="text-xs text-stone-500 font-display tracking-wide">Turn {turnNumber}</span>}
+          {turnNumber && <span className="text-xs text-stone-300 font-display tracking-wide">Turn {turnNumber}</span>}
         </div>
 
         <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
@@ -44,7 +44,7 @@ export function PlayerStatusBar({ players, currentTurnPlayerId, turnNumber, myPl
                 <div className="text-sm font-semibold text-stone-100 truncate flex items-center gap-1.5">
                   <span className="inline-block w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: color }} />
                   {p.name}
-                  {isMe && <span className="text-[9px] text-stone-500 font-normal">(you)</span>}
+                  {isMe && <span className="text-[9px] text-stone-300 font-normal">(you)</span>}
                   {p.isDead && " 💀"}
                   {p.hasExited && " 🚪"}
                 </div>
@@ -53,7 +53,7 @@ export function PlayerStatusBar({ players, currentTurnPlayerId, turnNumber, myPl
                   <Badge variant="gold" className="text-[10px]">💰 {p.gold}</Badge>
                   <Badge variant="attention" className="text-[10px]">👁 {p.attentionPoints}</Badge>
                 </div>
-                <div className="text-[10px] text-stone-500 mt-1">
+                <div className="text-[10px] text-stone-300 mt-1">
                   Hand: {p.handCount} · Artifacts: {p.artifactCount}
                   {p.achievements.length > 0 && ` · 🏆${p.achievements.length}`}
                 </div>
@@ -70,7 +70,7 @@ export function PlayerStatusBar({ players, currentTurnPlayerId, turnNumber, myPl
             <span>⚔ <strong className="text-stone-200">{myStats.attacksRemaining}</strong> attacks</span>
             <span>🂠 <strong className="text-stone-200">{myStats.deckCount}</strong> in deck</span>
             <button
-              className="text-stone-500 underline hover:text-stone-300"
+              className="text-stone-300 underline hover:text-stone-300"
               onClick={() => setDiscardOpen(true)}
             >
               🗂 {myStats.discardPile.length} discarded
@@ -133,7 +133,7 @@ export function PlayerStatusBar({ players, currentTurnPlayerId, turnNumber, myPl
               )}
 
               {inspecting.tools.length === 0 && inspecting.artifacts.length === 0 && inspecting.achievements.length === 0 && (
-                <p className="text-stone-500 italic">Nothing to show yet.</p>
+                <p className="text-stone-300 italic">Nothing to show yet.</p>
               )}
             </div>
           </DialogContent>
@@ -148,7 +148,7 @@ export function PlayerStatusBar({ players, currentTurnPlayerId, turnNumber, myPl
               <DialogTitle className="font-display text-amber-300">Discard Pile ({myStats.discardPile.length})</DialogTitle>
             </DialogHeader>
             {myStats.discardPile.length === 0 ? (
-              <p className="text-sm text-stone-500 italic">Empty</p>
+              <p className="text-sm text-stone-300 italic">Empty</p>
             ) : (
               <div className="flex gap-3 overflow-x-auto pb-2">
                 {myStats.discardPile.map((card: HandCardView) => (

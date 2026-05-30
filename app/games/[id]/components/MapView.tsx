@@ -135,11 +135,11 @@ export function MapView({ map, players, currentPlayerId, isMyTurn, movementRemai
                 (p) => p.currentRoomId === room.id && !p.hasExited && !p.isDead,
               );
 
-              let fill = "#2a2520";
-              if (isMyRoom) fill = "#3d2a10";
-              else if (room.isEntrance) fill = "#1e2e1e";
-              else if (room.isMarket) fill = "#1e1e2e";
-              else if (room.hasArtifactSlot && room.artifact) fill = "#2e1e2e";
+              let fill = "#3a3028";
+              if (isMyRoom) fill = "#6b4418";
+              else if (room.isEntrance) fill = "#1e4a28";
+              else if (room.isMarket) fill = "#1e284a";
+              else if (room.hasArtifactSlot && room.artifact) fill = "#4a2050";
 
               return (
                 <g
@@ -216,21 +216,21 @@ export function MapView({ map, players, currentPlayerId, isMyTurn, movementRemai
         </div>
 
         {/* Legend */}
-        <div className="border-t border-stone-700 pt-2 mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-stone-500">
-          <span className="font-display text-stone-400 tracking-wide">Rooms:</span>
-          <span><span className="inline-block w-3 h-3 rounded-sm mr-1 align-middle" style={{background:"#3d2a10"}} />Your room</span>
-          <span><span className="inline-block w-3 h-3 rounded-sm mr-1 align-middle" style={{background:"#1e2e1e"}} />Entrance</span>
-          <span><span className="inline-block w-3 h-3 rounded-sm mr-1 align-middle" style={{background:"#1e1e2e"}} />Market</span>
-          <span><span className="inline-block w-3 h-3 rounded-sm mr-1 align-middle" style={{background:"#2e1e2e"}} />Artifact</span>
-          <span><span className="inline-block w-3 h-3 rounded-sm border-2 mr-1 align-middle" style={{borderColor:"#c9a84c"}} />Reachable</span>
+        <div className="border-t border-stone-700 pt-2 mt-2 flex flex-wrap gap-x-4 gap-y-1.5 text-xs text-stone-300">
+          <span className="font-display text-stone-200 tracking-wide">Rooms:</span>
+          <span className="flex items-center gap-1"><span className="inline-block w-4 h-4 rounded-sm" style={{background:"#6b4418"}} /> Your room</span>
+          <span className="flex items-center gap-1"><span className="inline-block w-4 h-4 rounded-sm" style={{background:"#1e4a28"}} /> Entrance</span>
+          <span className="flex items-center gap-1"><span className="inline-block w-4 h-4 rounded-sm" style={{background:"#1e284a"}} /> Market</span>
+          <span className="flex items-center gap-1"><span className="inline-block w-4 h-4 rounded-sm" style={{background:"#4a2050"}} /> Artifact</span>
+          <span className="flex items-center gap-1"><span className="inline-block w-4 h-4 rounded-sm border-2" style={{borderColor:"#c9a84c", background:"transparent"}} /> Reachable</span>
           <span>💎 Artifact &nbsp; 👹 Monsters</span>
-          <span className="font-display text-stone-400 tracking-wide">Tunnels:</span>
+          <span className="font-display text-stone-200 tracking-wide">Tunnels:</span>
           <span className="flex items-center gap-1">
-            <svg width="28" height="8"><line x1="0" y1="4" x2="28" y2="4" stroke="#57534e" strokeWidth="1.5" /></svg>
+            <svg width="28" height="8"><line x1="0" y1="4" x2="28" y2="4" stroke="#78716c" strokeWidth="2" /></svg>
             Normal
           </span>
           <span className="flex items-center gap-1">
-            <svg width="28" height="8"><line x1="0" y1="4" x2="28" y2="4" stroke="#dc2626" strokeWidth="2" /></svg>
+            <svg width="28" height="8"><line x1="0" y1="4" x2="28" y2="4" stroke="#dc2626" strokeWidth="2.5" /></svg>
             Requires 🔑
           </span>
           <span className="flex items-center gap-1">
@@ -270,7 +270,7 @@ export function MapView({ map, players, currentPlayerId, isMyTurn, movementRemai
                   Grab {myRoom.artifact.name} (+{myRoom.artifact.reputationPoints})
                 </Button>
               )}
-              {myRoom.isExit && (
+              {myRoom.isExit && me && me.artifactCount > 0 && (
                 <Button size="sm" variant="default" disabled={!isMyTurn} onClick={onEscape}>
                   🚪 Escape!
                 </Button>

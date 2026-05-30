@@ -75,7 +75,7 @@ export function GameCardTile({ card, action }: GameCardTileProps) {
   const cardBg = isThreat ? "bg-red-950/40" : "bg-amber-50";
   const cardBorder = isThreat ? "border-red-700" : "border-amber-700";
   const textPrimary = isThreat ? "text-red-100" : "text-stone-900";
-  const textSecondary = isThreat ? "text-red-300" : "text-stone-600";
+  const textSecondary = isThreat ? "text-red-300" : "text-stone-400";
 
   return (
     <div

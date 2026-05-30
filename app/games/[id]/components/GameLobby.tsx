@@ -46,15 +46,15 @@ export function GameLobby({ gameId, state, playerId, onPlayerSelect, onUpdate }:
   }
 
   const alreadyJoined = playerId && state.players.some((p) => p.id === playerId);
-  const inputCls = "w-full bg-stone-800 border border-stone-600 rounded px-3 py-2 text-sm text-stone-200 placeholder:text-stone-500 focus:outline-none focus:border-amber-600";
+  const inputCls = "w-full bg-stone-800 border border-stone-600 rounded px-3 py-2 text-sm text-stone-200 placeholder:text-stone-300 focus:outline-none focus:border-amber-600";
 
   return (
     <div className="min-h-screen flex items-center justify-center p-8">
       <div className="max-w-xl w-full space-y-6">
         <div className="text-center">
           <h1 className="font-display text-4xl text-amber-300 tracking-wider">Boot &amp; Loot</h1>
-          <p className="text-stone-500 text-sm mt-1">{state.map.name}</p>
-          <p className="text-stone-600 text-xs mt-0.5">Game ID: {gameId}</p>
+          <p className="text-stone-300 text-sm mt-1">{state.map.name}</p>
+          <p className="text-stone-400 text-xs mt-0.5">Game ID: {gameId}</p>
         </div>
 
         {error && (
@@ -65,7 +65,7 @@ export function GameLobby({ gameId, state, playerId, onPlayerSelect, onUpdate }:
         {state.players.length === 1 && (
           <button
             onClick={() => window.open(`/games/${gameId}?autoJoin=Player+2`, "_blank")}
-            className="w-full border border-dashed border-stone-600 rounded py-2 text-sm text-stone-500 hover:border-amber-700 hover:text-amber-500 transition-colors"
+            className="w-full border border-dashed border-stone-600 rounded py-2 text-sm text-stone-300 hover:border-amber-700 hover:text-amber-500 transition-colors"
           >
             ⚡ Open as Player 2 →
           </button>
@@ -77,13 +77,13 @@ export function GameLobby({ gameId, state, playerId, onPlayerSelect, onUpdate }:
             Adventurers ({state.players.length} / {state.map.name ? 5 : "?"})
           </h2>
           {state.players.length === 0 ? (
-            <p className="text-stone-500 text-sm italic">No one yet. Be the first.</p>
+            <p className="text-stone-300 text-sm italic">No one yet. Be the first.</p>
           ) : (
             <ul className="space-y-1.5">
               {state.players.map((p) => (
                 <li key={p.id} className={`px-3 py-1.5 rounded text-sm ${p.id === playerId ? "bg-stone-700 text-stone-100 font-semibold" : "text-stone-400"}`}>
                   {p.name}
-                  {p.id === playerId && <span className="text-xs text-stone-500 ml-2">(you)</span>}
+                  {p.id === playerId && <span className="text-xs text-stone-300 ml-2">(you)</span>}
                 </li>
               ))}
             </ul>

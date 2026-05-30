@@ -36,16 +36,16 @@ export function ActionLog({ log, players }: Props) {
   return (
     <div className="bg-stone-900 border border-stone-700 rounded-lg overflow-hidden">
       <div className="px-3 py-2 border-b border-stone-700">
-        <span className="font-display text-xs text-stone-500 tracking-widest uppercase">Action Log</span>
+        <span className="font-display text-xs text-stone-300 tracking-widest uppercase">Action Log</span>
       </div>
       <ScrollArea className="h-64 px-3 py-2">
         {turns.length === 0 ? (
-          <p className="text-xs text-stone-600 italic">No actions yet.</p>
+          <p className="text-xs text-stone-400 italic">No actions yet.</p>
         ) : (
           <div className="space-y-3">
             {turns.map((turn) => (
               <div key={turn.turnNumber}>
-                <div className="text-[10px] font-semibold text-stone-600 uppercase tracking-wide mb-1 flex items-center gap-1.5">
+                <div className="text-[10px] font-semibold text-stone-400 uppercase tracking-wide mb-1 flex items-center gap-1.5">
                   Turn {turn.turnNumber} —
                   <span className="inline-block w-2 h-2 rounded-full" style={{ backgroundColor: playerColor(turn.playerName) }} />
                   <span style={{ color: playerColor(turn.playerName) }}>{turn.playerName}</span>
@@ -55,7 +55,7 @@ export function ActionLog({ log, players }: Props) {
                     <li
                       key={i}
                       className={`text-xs ${
-                        line.indent ? "text-stone-600 pl-4" : "text-stone-400 pl-2 border-l border-stone-700"
+                        line.indent ? "text-stone-400 pl-4" : "text-stone-400 pl-2 border-l border-stone-700"
                       }`}
                     >
                       {line.text}
