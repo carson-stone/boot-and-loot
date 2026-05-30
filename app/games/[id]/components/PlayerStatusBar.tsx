@@ -97,7 +97,7 @@ export function PlayerStatusBar({ players, currentTurnPlayerId, turnNumber, myPl
 
               {inspecting.tools.length > 0 && (
                 <div>
-                  <div className="font-semibold text-slate-700 mb-1">Tools</div>
+                  <div className="font-bold text-slate-900 mb-1">Tools</div>
                   <div className="flex gap-1 flex-wrap">
                     {inspecting.tools.map((t) => (
                       <Badge key={t} variant="secondary">{t.replace(/_/g, " ")}</Badge>
@@ -108,7 +108,7 @@ export function PlayerStatusBar({ players, currentTurnPlayerId, turnNumber, myPl
 
               {inspecting.artifacts.length > 0 && (
                 <div>
-                  <div className="font-semibold text-slate-700 mb-1">Artifacts</div>
+                  <div className="font-bold text-slate-900 mb-1">Artifacts</div>
                   <ul className="space-y-1">
                     {inspecting.artifacts.map((a) => (
                       <li key={a.id} className="flex justify-between">
@@ -122,7 +122,7 @@ export function PlayerStatusBar({ players, currentTurnPlayerId, turnNumber, myPl
 
               {inspecting.achievements.length > 0 && (
                 <div>
-                  <div className="font-semibold text-slate-700 mb-1">Achievements</div>
+                  <div className="font-bold text-slate-900 mb-1">Achievements</div>
                   <ul className="space-y-1">
                     {inspecting.achievements.map((a) => (
                       <li key={a.code} className="flex justify-between">
@@ -135,7 +135,7 @@ export function PlayerStatusBar({ players, currentTurnPlayerId, turnNumber, myPl
               )}
 
               {inspecting.tools.length === 0 && inspecting.artifacts.length === 0 && inspecting.achievements.length === 0 && (
-                <p className="text-slate-500">Nothing to show yet.</p>
+                <p className="text-slate-600">Nothing to show yet.</p>
               )}
             </div>
           </DialogContent>
