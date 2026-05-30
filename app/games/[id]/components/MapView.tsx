@@ -139,7 +139,6 @@ export function MapView({ map, players, currentPlayerId, isMyTurn, movementRemai
               if (isMyRoom) fill = "#6b4418";
               else if (room.isEntrance) fill = "#1e4a28";
               else if (room.isMarket) fill = "#1e284a";
-              else if (room.hasArtifactSlot && room.artifact) fill = "#4a2050";
 
               return (
                 <g
@@ -218,17 +217,12 @@ export function MapView({ map, players, currentPlayerId, isMyTurn, movementRemai
         {/* Legend */}
         <div className="border-t border-stone-700 pt-2 mt-2 flex flex-wrap gap-x-4 gap-y-1.5 text-xs text-stone-300">
           <span className="font-display text-stone-200 tracking-wide">Rooms:</span>
-          <span className="flex items-center gap-1"><span className="inline-block w-4 h-4 rounded-sm" style={{background:"#6b4418"}} /> Your room</span>
+          <span className="flex items-center gap-1"><span className="inline-block w-4 h-4 rounded-sm" style={{background:"#6b4418"}} /> Current room</span>
           <span className="flex items-center gap-1"><span className="inline-block w-4 h-4 rounded-sm" style={{background:"#1e4a28"}} /> Entrance</span>
           <span className="flex items-center gap-1"><span className="inline-block w-4 h-4 rounded-sm" style={{background:"#1e284a"}} /> Market</span>
-          <span className="flex items-center gap-1"><span className="inline-block w-4 h-4 rounded-sm" style={{background:"#4a2050"}} /> Artifact</span>
           <span className="flex items-center gap-1"><span className="inline-block w-4 h-4 rounded-sm border-2" style={{borderColor:"#c9a84c", background:"transparent"}} /> Reachable</span>
           <span>💎 Artifact &nbsp; 👹 Monsters</span>
           <span className="font-display text-stone-200 tracking-wide">Tunnels:</span>
-          <span className="flex items-center gap-1">
-            <svg width="28" height="8"><line x1="0" y1="4" x2="28" y2="4" stroke="#78716c" strokeWidth="2" /></svg>
-            Normal
-          </span>
           <span className="flex items-center gap-1">
             <svg width="28" height="8"><line x1="0" y1="4" x2="28" y2="4" stroke="#dc2626" strokeWidth="2.5" /></svg>
             Requires 🔑
