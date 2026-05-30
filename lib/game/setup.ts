@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/db";
 import { GameError } from "./types";
-import { drawCards, type TxClient } from "./deck";
+import { drawCards } from "./deck";
+import type { TxClient } from "./types";
 import { resolveHordeAttack } from "./horde";
 
 export async function createGame(mapName: string, maxPlayers: number = 5) {

@@ -1,4 +1,4 @@
-import type { TxClient } from "./deck";
+import type { TxClient } from "./types";
 import type { ActionLogEntry } from "./cardEffects";
 
 async function awardAchievement(

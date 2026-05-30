@@ -1,4 +1,4 @@
-import type { TxClient } from "./deck";
+import type { TxClient } from "./types";
 
 interface PoolEntry {
   owner: string; // player ID or "filler"
@@ -68,38 +68,12 @@ export async function resolveHordeAttack(
 
   const poolSizeBefore = pool.length;
 
-  // 2. Calculate horde damage
+  // 2. Calculate horde damage: base + artifacts currently held.
+  // Known limitation: artifacts dropped by dead players aren't counted; use action log
+  // pickup entries to track lifetime pickups accurately in a future pass.
   const artifactsTaken = await tx.gameArtifact.count({
-    where: {
-      gameId,
-      heldByPlayerId: { not: null },
-    },
+    where: { gameId, heldByPlayerId: { not: null } },
   });
-  // Also count artifacts dropped by dead players (they were "picked up" at some point)
-  const artifactsDropped = await tx.gameArtifact.count({
-    where: {
-      gameId,
-      roomId: { not: null },
-    },
-  });
-  // We need artifacts that were ever picked up. Those currently held count.
-  // Those dropped by dead players are back in rooms but were picked up.
-  // Actually, the simplest approach: count total artifacts minus those still at original placements.
-  // For now, use a simpler metric: base damage + artifacts currently held
-  // The rulebook says "every artifact that has been picked up over the course of the game"
-  // We track this by checking if any artifact has heldByPlayerId set or was ever moved from original room
-  // For simplicity, we'll count artifacts not at their original room placement
-  const totalArtifacts = await tx.gameArtifact.count({ where: { gameId } });
-  const artifactsAtOriginalRoom = await tx.gameArtifact.count({
-    where: {
-      gameId,
-      roomId: { not: null },
-    },
-  });
-  // Artifacts ever picked up = total - still in original rooms
-  // But dropped artifacts are also in rooms... We need to track this differently.
-  // Best approach: just use artifactsTaken (currently held) as a proxy for now.
-  // TODO: Track total pickups via action log for accurate count
   const hordeDamage = game.hordeDamageAmount + artifactsTaken;
 
   // 3. Randomly remove points from pool

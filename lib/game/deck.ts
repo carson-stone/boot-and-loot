@@ -1,6 +1,4 @@
-import type { PrismaClient } from "@/lib/generated/prisma/client";
-
-export type TxClient = Omit<PrismaClient, "$connect" | "$disconnect" | "$on" | "$transaction" | "$use" | "$extends">;
+import type { TxClient } from "./types";
 
 export async function drawCards(
   tx: TxClient,

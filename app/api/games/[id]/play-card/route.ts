@@ -52,31 +52,14 @@ export async function POST(
     // Build context and resolve
     const turnState = await loadTurnState(game.currentTurn.id);
 
-    // Pre-load upgrade candidates for Alchemy (scripted effects can't query the DB directly)
-    const upgradeableCards: import("@/lib/game/cardEffects").UpgradeableCard[] = [];
-    if (gameCard.cardDefinition.name === "Alchemy") {
-      const [silverDef, goldDef] = await Promise.all([
-        prisma.cardDefinition.findUnique({ where: { name: "Silver Coin" } }),
-        prisma.cardDefinition.findUnique({ where: { name: "Gold Pouch" } }),
-      ]);
-      const coppers = silverDef ? await prisma.gameCard.findMany({
-        where: { gameId, playerId, location: { in: ["player_discard", "player_play_area"] }, cardDefinition: { name: "Copper Coin" } },
-        take: 3,
-      }) : [];
-      if (coppers.length > 0 && silverDef) {
-        for (const c of coppers) upgradeableCards.push({ gameCardId: c.id, cardName: "Copper Coin", upgradedDefinitionId: silverDef.id, upgradedCardName: "Silver Coin" });
-      } else if (goldDef) {
-        const silver = await prisma.gameCard.findFirst({
-          where: { gameId, playerId, location: { in: ["player_discard", "player_play_area"] }, cardDefinition: { name: "Silver Coin" } },
-        });
-        if (silver) upgradeableCards.push({ gameCardId: silver.id, cardName: "Silver Coin", upgradedDefinitionId: goldDef.id, upgradedCardName: "Gold Pouch" });
-      }
-    } else if (gameCard.cardDefinition.name === "Smelt") {
-      const coppers = await prisma.gameCard.findMany({
-        where: { gameId, playerId, location: { in: ["player_discard", "player_play_area"] }, cardDefinition: { name: "Copper Coin" } },
-        take: 3,
-      });
-      for (const c of coppers) upgradeableCards.push({ gameCardId: c.id, cardName: "Copper Coin", upgradedDefinitionId: "", upgradedCardName: "" });
+    // Pre-load context for scripted effects. Each script_id maps to a preloader in
+    // scriptPreloaders.ts — add new scripted cards there, not here.
+    let upgradeableCards: import("@/lib/game/cardEffects").UpgradeableCard[] = [];
+    const scriptedEffect = gameCard.cardDefinition.effects.find((e) => e.effectType === "scripted");
+    if (scriptedEffect) {
+      const scriptId = (scriptedEffect.parametersJson as { script_id?: string }).script_id ?? "";
+      const preloader = (await import("@/lib/game/scriptPreloaders")).SCRIPT_PRELOADERS[scriptId];
+      if (preloader) upgradeableCards = await preloader(gameId, playerId);
     }
 
     const ctx = await buildPlayContext(gameId, playerId, gameCardId, turnState, upgradeableCards);

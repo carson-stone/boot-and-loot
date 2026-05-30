@@ -1,4 +1,8 @@
+import type { PrismaClient } from "@/lib/generated/prisma/client";
 import type { TurnModifiers, TurnResources } from "./cardEffects";
+
+/** Prisma interactive transaction client — usable anywhere a normal client is expected except $transaction itself. */
+export type TxClient = Omit<PrismaClient, "$connect" | "$disconnect" | "$on" | "$transaction" | "$use" | "$extends">;
 
 export interface TurnState {
   turnId: string;

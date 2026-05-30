@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/db";
+import type { HandCardView } from "./types";
 import type {
   PlayerView,
   TurnModifiers,
@@ -9,6 +10,33 @@ import type {
 } from "./cardEffects";
 import type { GameView, TurnState } from "./types";
 import { GameError } from "./types";
+
+/** Converts a game card row (with definition + effects included) to a HandCardView. */
+function toHandCardView(c: {
+  id: string;
+  cardDefinitionId: string;
+  cardDefinition: {
+    name: string; cardType: string; costGold: number; costFocus: number;
+    isOneTimeUse: boolean; description: string | null;
+    effects: { effectType: string; amount: number; parametersJson: unknown }[];
+  };
+}): HandCardView {
+  return {
+    gameCardId: c.id,
+    cardDefinitionId: c.cardDefinitionId,
+    name: c.cardDefinition.name,
+    cardType: c.cardDefinition.cardType,
+    costGold: c.cardDefinition.costGold,
+    costFocus: c.cardDefinition.costFocus,
+    isOneTimeUse: c.cardDefinition.isOneTimeUse,
+    description: c.cardDefinition.description,
+    effects: c.cardDefinition.effects.map((e) => ({
+      effectType: e.effectType,
+      amount: e.amount,
+      parametersJson: e.parametersJson as Record<string, unknown>,
+    })),
+  };
+}
 
 export async function loadTurnState(turnId: string): Promise<TurnState> {
   const turn = await prisma.turn.findUniqueOrThrow({ where: { id: turnId } });
@@ -278,21 +306,7 @@ export async function loadGameState(gameId: string, requestingPlayerId?: string)
         },
       },
     });
-    myHand = handCards.map((c) => ({
-      gameCardId: c.id,
-      cardDefinitionId: c.cardDefinitionId,
-      name: c.cardDefinition.name,
-      cardType: c.cardDefinition.cardType,
-      costGold: c.cardDefinition.costGold,
-      costFocus: c.cardDefinition.costFocus,
-      isOneTimeUse: c.cardDefinition.isOneTimeUse,
-      description: c.cardDefinition.description,
-      effects: c.cardDefinition.effects.map((e) => ({
-        effectType: e.effectType,
-        amount: e.amount,
-        parametersJson: e.parametersJson as Record<string, unknown>,
-      })),
-    }));
+    myHand = handCards.map(toHandCardView);
   }
 
   // Action log from current turn
@@ -326,21 +340,7 @@ export async function loadGameState(gameId: string, requestingPlayerId?: string)
         movementRemaining: turnState.resources.movement,
         attacksRemaining: turnState.resources.attacks - turnState.attacksUsedThisTurn,
         deckCount,
-        discardPile: discardCards.map((c) => ({
-          gameCardId: c.id,
-          cardDefinitionId: c.cardDefinitionId,
-          name: c.cardDefinition.name,
-          cardType: c.cardDefinition.cardType,
-          costGold: c.cardDefinition.costGold,
-          costFocus: c.cardDefinition.costFocus,
-          isOneTimeUse: c.cardDefinition.isOneTimeUse,
-          description: c.cardDefinition.description,
-          effects: c.cardDefinition.effects.map((e) => ({
-            effectType: e.effectType,
-            amount: e.amount,
-            parametersJson: e.parametersJson as Record<string, unknown>,
-          })),
-        })),
+        discardPile: discardCards.map(toHandCardView),
       };
     }
   }

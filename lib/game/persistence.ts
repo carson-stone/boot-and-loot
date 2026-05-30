@@ -1,4 +1,4 @@
-import type { TxClient } from "./deck";
+import type { TxClient } from "./types";
 import { drawCards } from "./deck";
 import type { StateDelta, ActionLogEntry } from "./cardEffects";
 
