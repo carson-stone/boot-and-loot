@@ -94,7 +94,6 @@ export function MapView({ map, players, currentPlayerId, isMyTurn, movementRemai
                     y2={tc.y}
                     stroke={conn.requiresTool ? "#dc2626" : "#94a3b8"}
                     strokeWidth={conn.requiresTool ? 2 : 1}
-                    strokeDasharray={conn.requiresTool ? "6,3" : undefined}
                   />
                   {isOneWay && (
                     <polygon
@@ -231,7 +230,7 @@ export function MapView({ map, players, currentPlayerId, isMyTurn, movementRemai
             Normal
           </span>
           <span className="flex items-center gap-1">
-            <svg width="28" height="8"><line x1="0" y1="4" x2="28" y2="4" stroke="#dc2626" strokeWidth="2" strokeDasharray="6,3" /></svg>
+            <svg width="28" height="8"><line x1="0" y1="4" x2="28" y2="4" stroke="#dc2626" strokeWidth="2" /></svg>
             Requires 🔑
           </span>
           <span className="flex items-center gap-1">
