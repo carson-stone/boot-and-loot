@@ -37,7 +37,7 @@ function effectLabel(e: EffectView): string {
     case "draw_cards":                           return `🂠 draw ${n}`;
     case "heal":                                 return `❤️ heal ${n}`;
     case "remove_attention":                     return `👁 −${n}`;
-    case "redirect_attention_to_filler":         return `👁 dissolve ${n} into the Din`;
+    case "redirect_attention_to_filler":         return `👁 convert ${n} to Luck in the Fray`;
     case "all_others_gain_attention":            return `👁 others +${n}`;
     case "all_others_lose_gold_this_turn":       return `💰 others −${n}`;
     case "multiply_gold_this_turn":              return `💰 ×${n} this turn`;
