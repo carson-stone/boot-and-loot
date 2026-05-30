@@ -66,8 +66,16 @@ export default function GamePage({ params }: { params: Promise<{ id: string }> }
   if (error) {
     return (
       <div className="min-h-screen flex items-center justify-center p-8">
-        <div className="bg-red-50 border border-red-200 text-red-900 rounded-md px-6 py-4">
-          {error}
+        <div className="text-center space-y-4">
+          <div className="bg-red-900/50 border border-red-700 text-red-200 rounded-lg px-6 py-4">
+            {error}
+          </div>
+          <a
+            href="/"
+            className="inline-block text-sm text-amber-400 hover:text-amber-300 underline underline-offset-4"
+          >
+            ← Back to main menu
+          </a>
         </div>
       </div>
     );
@@ -76,7 +84,7 @@ export default function GamePage({ params }: { params: Promise<{ id: string }> }
   if (!state) {
     return (
       <div className="min-h-screen flex items-center justify-center p-8">
-        <div className="text-slate-500">Loading game...</div>
+        <div className="text-stone-500">Loading game...</div>
       </div>
     );
   }
