@@ -16,6 +16,7 @@ enum CardType {
   device
   companion
   spell
+  treasure
 }
 
 enum CardPool {

@@ -117,7 +117,7 @@ export interface PlayContext {
   cardInstanceId: string;            // the game_cards.id being played
   cardName: string;                  // human-readable name for action log
   cardIsOneTimeUse: boolean;         // from card_definitions.is_one_time_use
-  cardType: "monster" | "device" | "companion" | "spell";
+  cardType: "monster" | "device" | "companion" | "spell" | "treasure";
   upgradeableCards: UpgradeableCard[]; // pre-resolved by route handler for scripted effects
 }
 

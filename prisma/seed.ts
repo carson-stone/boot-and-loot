@@ -86,12 +86,12 @@ async function main() {
 
   const cards: CardDef[] = [
     // ---- Starter ----
-    { name: "Copper Coin", cardType: "device", pool: "starter", description: "A simple coin. Basic income.", totalQuantity: 6, effects: [{ displayOrder: 0, effectType: "gain_gold", amount: 1 }] },
+    { name: "Copper Coin", cardType: "treasure", pool: "starter", description: "A simple coin. Basic income.", totalQuantity: 6, effects: [{ displayOrder: 0, effectType: "gain_gold", amount: 1 }] },
     { name: "Walking Stick", cardType: "device", pool: "starter", costGold: 0, description: "Helps you cover ground.", totalQuantity: 3, effects: [{ displayOrder: 0, effectType: "gain_movement", amount: 1 }] },
     { name: "Rusty Dagger", cardType: "device", pool: "starter", costGold: 0, description: "Better than fists. Barely.", totalQuantity: 1, effects: [{ displayOrder: 0, effectType: "gain_attack", amount: 1 }] },
 
     // ---- Static market ----
-    { name: "Silver Coin", cardType: "device", pool: "static", costFocus: 3, description: "A better coin. Builds toward real wealth.", totalQuantity: 10, effects: [{ displayOrder: 0, effectType: "gain_gold", amount: 2 }] },
+    { name: "Silver Coin", cardType: "treasure", pool: "static", costFocus: 3, description: "A better coin. Builds toward real wealth.", totalQuantity: 10, effects: [{ displayOrder: 0, effectType: "gain_gold", amount: 2 }] },
     { name: "Adventurer's Boots", cardType: "device", pool: "static", costFocus: 4, description: "Speed when you need it.", totalQuantity: 10, effects: [{ displayOrder: 0, effectType: "gain_movement", amount: 2 }] },
     { name: "Short Sword", cardType: "device", pool: "static", costFocus: 4, description: "Real steel.", totalQuantity: 10, effects: [{ displayOrder: 0, effectType: "gain_attack", amount: 2 }] },
     { name: "Hired Hand", cardType: "companion", pool: "static", costFocus: 3, description: "A useful traveling friend.", totalQuantity: 10, effects: [{ displayOrder: 0, effectType: "gain_focus", amount: 1 }, { displayOrder: 1, effectType: "draw_cards", amount: 1 }] },
@@ -107,7 +107,7 @@ async function main() {
     { name: "Tracker", cardType: "companion", pool: "dynamic", costFocus: 4, description: "Reads the dungeon like a book. Gain 1 movement and draw 1 card.", totalQuantity: 3, effects: [{ displayOrder: 0, effectType: "gain_movement", amount: 1 }, { displayOrder: 1, effectType: "draw_cards", amount: 1 }] },
     { name: "Fence", cardType: "companion", pool: "dynamic", costFocus: 3, description: "Turns contraband into opportunity. Gain 1 gold and 1 focus.", totalQuantity: 3, effects: [{ displayOrder: 0, effectType: "gain_gold", amount: 1 }, { displayOrder: 1, effectType: "gain_focus", amount: 1 }] },
     { name: "Tomb Raider", cardType: "companion", pool: "dynamic", costFocus: 6, costGold: 1, description: "Expensive company, but she pays for herself. Gain 2 focus and draw 2 cards.", totalQuantity: 2, effects: [{ displayOrder: 0, effectType: "gain_focus", amount: 2 }, { displayOrder: 1, effectType: "draw_cards", amount: 2 }] },
-    { name: "Gold Pouch", cardType: "device", pool: "dynamic", costFocus: 5, description: "A heavy purse.", totalQuantity: 4, effects: [{ displayOrder: 0, effectType: "gain_gold", amount: 3 }] },
+    { name: "Gold Pouch", cardType: "treasure", pool: "dynamic", costFocus: 5, description: "A heavy purse.", totalQuantity: 4, effects: [{ displayOrder: 0, effectType: "gain_gold", amount: 3 }] },
     { name: "Lantern Bearer", cardType: "companion", pool: "dynamic", costFocus: 4, description: "Light and a stout arm.", totalQuantity: 3, effects: [{ displayOrder: 0, effectType: "gain_movement", amount: 1 }, { displayOrder: 1, effectType: "gain_attack", amount: 1 }] },
     { name: "Veteran Mercenary", cardType: "companion", pool: "dynamic", costFocus: 4, costGold: 2, description: "Battle-tested. Worth the coin — and some gold.", totalQuantity: 3, effects: [{ displayOrder: 0, effectType: "gain_gold", amount: 1 }, { displayOrder: 1, effectType: "gain_attack", amount: 2 }] },
     { name: "Treasure Map", cardType: "device", pool: "dynamic", costFocus: 5, description: "Points to riches. And card draws.", totalQuantity: 3, effects: [{ displayOrder: 0, effectType: "gain_movement", amount: 2 }, { displayOrder: 1, effectType: "draw_cards", amount: 1 }] },
@@ -119,7 +119,7 @@ async function main() {
     { name: "Ogre Brute", cardType: "monster", pool: "dynamic", costGold: 0, isKillableThreat: true, description: "A wall of muscle and bad intentions.", totalQuantity: 2, resolutionOptions: [
       { label: "Fight", displayOrder: 0, costAttacks: 3, rewardGold: 4 },
     ]},
-    { name: "Bag of Loot", cardType: "device", pool: "dynamic", costFocus: 5, description: "A heavy sack — coins and a quick step.", totalQuantity: 3, effects: [{ displayOrder: 0, effectType: "gain_gold", amount: 2 }, { displayOrder: 1, effectType: "gain_movement", amount: 1 }] },
+    { name: "Bag of Loot", cardType: "treasure", pool: "dynamic", costFocus: 5, description: "A heavy sack — coins and a quick step.", totalQuantity: 3, effects: [{ displayOrder: 0, effectType: "gain_gold", amount: 2 }, { displayOrder: 1, effectType: "gain_movement", amount: 1 }] },
     { name: "Map Fragment", cardType: "device", pool: "dynamic", costFocus: 3, description: "A torn corner of a larger map.", totalQuantity: 4, effects: [{ displayOrder: 0, effectType: "gain_movement", amount: 1 }, { displayOrder: 1, effectType: "draw_cards", amount: 1 }] },
     { name: "Cultist", cardType: "monster", pool: "dynamic", costGold: 0, isKillableThreat: true, description: "A fanatic offering a deal. Fight or pay the price.", totalQuantity: 3, resolutionOptions: [
       { label: "Fight", displayOrder: 0, costAttacks: 2, rewardGold: 3, rewardReputation: 1 },

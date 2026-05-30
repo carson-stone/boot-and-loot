@@ -66,6 +66,7 @@ const TYPE_STYLES: Record<string, { badge: string; border: string; bg: string }>
   device:    { badge: "bg-blue-900 text-blue-200 border-blue-700",  border: "border-stone-600",  bg: "bg-amber-50" },
   companion: { badge: "bg-green-900 text-green-200 border-green-700", border: "border-stone-600", bg: "bg-amber-50" },
   spell:     { badge: "bg-purple-900 text-purple-200 border-purple-700", border: "border-purple-700", bg: "bg-purple-950/20" },
+  treasure:  { badge: "bg-yellow-900 text-yellow-200 border-yellow-700", border: "border-yellow-700", bg: "bg-yellow-950/20" },
 };
 
 export function GameCardTile({ card, action }: GameCardTileProps) {
